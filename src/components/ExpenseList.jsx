@@ -553,7 +553,7 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                     : "No expenses match your filters"}
                 </p>
                 {expenseArray.length > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4">
                     <button
                       onClick={clearFilters}
                       className="text-amber-600 hover:text-amber-800 text-sm font-medium"
@@ -598,9 +598,21 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-                        <span className="font-semibold text-amber-700 text-sm sm:text-base whitespace-nowrap">
-                          -₱{expense.amount.toFixed(2)}
-                        </span>
+                        <div className="flex flex-col items-center space-y-0.5 sm:space-y-1">
+                          <span className="font-semibold text-amber-700 text-sm sm:text-base whitespace-nowrap">
+                            -₱{expense.amount.toFixed(2)}
+                          </span>
+                          {expense.imageUrl && (
+                            <button
+                              onClick={() =>
+                                window.open(expense.imageUrl, "_blank")
+                              }
+                              className="text-xs text-amber-600 underline hover:text-amber-800"
+                            >
+                              View Receipt
+                            </button>
+                          )}
+                        </div>
                         <button
                           onClick={() => onDelete(expense.id)}
                           className="p-1.5 sm:p-2 text-amber-400 hover:text-amber-600 hover:bg-amber-50 rounded-full transition-colors active:scale-90"

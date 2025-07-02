@@ -4,18 +4,61 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [budgetId, setBudgetId] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim() || !amount || !budgetId) return;
+
+    let imageUrl = "";
+
+    if (imageFile) {
+      try {
+        setUploading(true);
+
+        const formData = new FormData();
+
+        // Format the image name: expense-name-timestamp (spaces removed)
+        const cleanName = name.trim().toLowerCase().replace(/\s+/g, "_");
+        const timestamp = Date.now();
+        const publicId = `receipt_${cleanName}_${timestamp}`;
+
+        formData.append("file", imageFile);
+        formData.append("upload_preset", "receipt_upload"); // your unsigned preset
+        formData.append("public_id", publicId); // custom image name
+        formData.append("tags", "expense,receipt"); // comma-separated tags
+
+        const res = await fetch(
+          "https://api.cloudinary.com/v1_1/dpiupmmsg/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const data = await res.json();
+        imageUrl = data.secure_url;
+      } catch (err) {
+        alert("Image upload failed");
+        console.error(err);
+        setUploading(false);
+        return;
+      }
+    }
+
     onSubmit({
       name,
       amount: parseFloat(amount),
       budgetId,
+      imageUrl,
       date: new Date().toISOString().split("T")[0],
     });
+
     setName("");
     setAmount("");
     setBudgetId("");
+    setImageFile(null);
+    setUploading(false);
   };
 
   return (
@@ -32,7 +75,7 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-3 border border-[#B8906B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8906B]"
+            className="w-full px-4 py-3 border border-[#B8906B] rounded-lg"
             placeholder="e.g., Grocery, Gas"
             required
           />
@@ -47,7 +90,7 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-4 py-3 border border-[#B8906B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8906B]"
+            className="w-full px-4 py-3 border border-[#B8906B] rounded-lg"
             placeholder="0.00"
             required
           />
@@ -78,16 +121,29 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
           </div>
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-[#543310] mb-2">
+            Upload Receipt (optional)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files[0])}
+            className="block w-full text-sm text-[#543310] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#B8906B] file:text-white hover:file:bg-[#a97c59]"
+          />
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-[#B8906B] text-white py-3 px-4 rounded-lg whitespace-nowrap hover:bg-[#a97c59]"
+            disabled={uploading}
+            className="flex-1 bg-[#B8906B] text-white py-3 px-4 rounded-lg hover:bg-[#a97c59]"
           >
-            Add Expense
+            {uploading ? "Uploading..." : "Add Expense"}
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg whitespace-nowrap hover:bg-[#d4c3b0]"
+            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg hover:bg-[#d4c3b0]"
           >
             Cancel
           </button>
