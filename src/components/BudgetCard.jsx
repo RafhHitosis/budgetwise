@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Edit3, Trash2 } from "lucide-react";
 
-const BudgetCard = ({ budget, onEdit, onDelete, onExpenseDeduct }) => {
+const BudgetCard = ({ budget, onEdit, onDelete, onExpenseDeduct, colors }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const percentage = (budget.spent / budget.amount) * 100;
   const remaining = budget.amount - budget.spent;
@@ -17,27 +17,36 @@ const BudgetCard = ({ budget, onEdit, onDelete, onExpenseDeduct }) => {
 
   return (
     <div
-      className={`bg-amber-50 rounded-xl shadow-lg p-6 border-l-4 border-[#B8906B] transition-all duration-300 ${
+      style={{
+        backgroundColor: colors.cardBg,
+        color: colors.text,
+        borderColor: colors.border,
+      }}
+      className={`rounded-xl shadow-lg p-6 border-l-4 transition-all duration-300 ${
         isAnimating ? "scale-105 shadow-xl" : ""
       }`}
     >
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-amber-900">
+          <h3 className="text-lg font-semibold" style={{ color: colors.text }}>
             {budget.name}
           </h3>
-          <p className="text-sm text-amber-700">Budget</p>
+          <p style={{ color: colors.secondaryText }} className="text-sm">
+            Budget
+          </p>
         </div>
         <div className="flex space-x-2">
           <button
             onClick={() => onEdit(budget)}
-            className="p-2 text-amber-600 hover:text-amber-800"
+            style={{ color: colors.text, cursor: "pointer" }}
+            className="p-2"
           >
             <Edit3 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(budget.id)}
-            className="p-2 text-amber-600 hover:text-red-600"
+            style={{ color: colors.text, cursor: "pointer" }}
+            className="p-2"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -46,10 +55,10 @@ const BudgetCard = ({ budget, onEdit, onDelete, onExpenseDeduct }) => {
 
       <div className="space-y-3">
         <div className="flex justify-between">
-          <span className="text-2xl font-bold text-amber-900">
+          <span style={{ color: colors.text }} className="text-2xl font-bold">
             ₱{remaining.toFixed(2)}
           </span>
-          <span className="text-sm text-amber-700">
+          <span style={{ color: colors.text }} className="text-sm">
             of ₱{budget.amount.toFixed(2)}
           </span>
         </div>
@@ -68,12 +77,12 @@ const BudgetCard = ({ budget, onEdit, onDelete, onExpenseDeduct }) => {
         </div>
 
         <div className="flex justify-between text-sm">
-          <span className="text-amber-700">
+          <span style={{ color: colors.text }}>
             Spent: ₱{budget.spent.toFixed(2)}
           </span>
           <span
             className={`font-medium ${
-              percentage > 90 ? "text-red-600" : "text-amber-800"
+              percentage > 90 ? "text-red-600" : colors.text
             }`}
           >
             {percentage.toFixed(1)}%

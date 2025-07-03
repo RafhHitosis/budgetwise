@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Calculator } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-const GoalForm = ({ initialData, onSubmit, onCancel }) => {
+const GoalForm = ({ initialData, onSubmit, onCancel, colors }) => {
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
@@ -75,7 +77,7 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
     }
   };
 
-  const today = new Date().toISOString().split("T")[0];
+  // const today = new Date().toISOString().split("T")[0];
 
   return (
     <div>
@@ -84,11 +86,11 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
         <div>
           <h2
             className="text-xl sm:text-2xl font-bold"
-            style={{ color: "#543310" }}
+            style={{ color: colors.text }}
           >
             {initialData ? "Edit Goal" : "Add New Goal"}
           </h2>
-          <p className="text-sm" style={{ color: "#74512D" }}>
+          <p className="text-sm" style={{ color: colors.text }}>
             Set a savings target and get bi-monthly contribution suggestions
           </p>
         </div>
@@ -100,7 +102,7 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
           <label
             htmlFor="name"
             className="block text-sm font-medium mb-2"
-            style={{ color: "#543310" }}
+            style={{ color: colors.text }}
           >
             Goal Name
           </label>
@@ -112,12 +114,7 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
             onChange={handleInputChange}
             placeholder="e.g., Laptop Dell XPS 13"
             required
-            className="w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300"
-            style={{
-              backgroundColor: "#F8F4E1",
-              borderColor: "#AF8F6F",
-              color: "#543310",
-            }}
+            className="w-full px-4 py-3 border border-[#B8906B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8906B]"
           />
         </div>
 
@@ -127,7 +124,7 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
             <label
               htmlFor="amount"
               className="block text-sm font-medium mb-2"
-              style={{ color: "#543310" }}
+              style={{ color: colors.text }}
             >
               Target Amount (₱)
             </label>
@@ -141,12 +138,7 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
               min="1"
               step="0.01"
               required
-              className="w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300"
-              style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#AF8F6F",
-                color: "#543310",
-              }}
+              className="w-full px-4 py-3 border border-[#B8906B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8906B]"
             />
           </div>
 
@@ -154,7 +146,7 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
             <label
               htmlFor="saved"
               className="block text-sm font-medium mb-2"
-              style={{ color: "#543310" }}
+              style={{ color: colors.text }}
             >
               Already Saved (₱)
             </label>
@@ -167,12 +159,7 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
               placeholder="0"
               min="0"
               step="0.01"
-              className="w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300"
-              style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#AF8F6F",
-                color: "#543310",
-              }}
+              className="w-full px-4 py-3 border border-[#B8906B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8906B]"
             />
           </div>
         </div>
@@ -183,23 +170,26 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
             <label
               htmlFor="startDate"
               className="block text-sm font-medium mb-2"
-              style={{ color: "#543310" }}
+              style={{ color: colors.text }}
             >
               Start Date
             </label>
-            <input
-              type="date"
-              id="startDate"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleInputChange}
-              max={formData.targetDate || undefined}
-              className="w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300"
-              style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#AF8F6F",
-                color: "#543310",
-              }}
+            <DatePicker
+              selected={
+                formData.startDate ? new Date(formData.startDate) : null
+              }
+              onChange={(date) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  startDate: date.toISOString().split("T")[0],
+                }))
+              }
+              maxDate={
+                formData.targetDate ? new Date(formData.targetDate) : null
+              }
+              className="w-full px-4 py-3 border border-[#B8906B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8906B]"
+              placeholderText="Select start date"
+              dateFormat="yyyy-MM-dd"
             />
           </div>
 
@@ -207,24 +197,26 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
             <label
               htmlFor="targetDate"
               className="block text-sm font-medium mb-2"
-              style={{ color: "#543310" }}
+              style={{ color: colors.text }}
             >
               Target Date
             </label>
-            <input
-              type="date"
-              id="targetDate"
-              name="targetDate"
-              value={formData.targetDate}
-              onChange={handleInputChange}
-              min={formData.startDate || today}
-              required
-              className="w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-300"
-              style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#AF8F6F",
-                color: "#543310",
-              }}
+            <DatePicker
+              selected={
+                formData.targetDate ? new Date(formData.targetDate) : null
+              }
+              onChange={(date) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  targetDate: date.toISOString().split("T")[0],
+                }))
+              }
+              minDate={
+                formData.startDate ? new Date(formData.startDate) : new Date()
+              }
+              className="w-full px-4 py-3 border border-[#B8906B] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B8906B]"
+              placeholderText="Select target date"
+              dateFormat="yyyy-MM-dd"
             />
           </div>
         </div>
@@ -233,21 +225,24 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
         {formData.amount && formData.targetDate && (
           <div
             className="p-4 rounded-xl border-2"
-            style={{ backgroundColor: "#E8DCC0", borderColor: "#AF8F6F" }}
+            style={{
+              backgroundColor: colors.cardBg,
+              borderColor: colors.border,
+            }}
           >
             <div className="flex items-center space-x-2 mb-2">
-              <Calculator className="w-4 h-4" style={{ color: "#74512D" }} />
+              <Calculator className="w-4 h-4" style={{ color: colors.text }} />
               <span
                 className="text-sm font-medium"
-                style={{ color: "#74512D" }}
+                style={{ color: colors.text }}
               >
                 Suggested Kinsenas Contribution
               </span>
             </div>
-            <div className="text-lg font-bold" style={{ color: "#543310" }}>
+            <div className="text-lg font-bold" style={{ color: colors.text }}>
               ₱{suggestedContribution.toFixed(2)} per kinsenas
             </div>
-            <p className="text-xs mt-1" style={{ color: "#74512D" }}>
+            <p className="text-xs mt-1" style={{ color: colors.text }}>
               Based on your timeline and remaining amount
             </p>
           </div>
@@ -256,25 +251,17 @@ const GoalForm = ({ initialData, onSubmit, onCancel }) => {
         {/* Action Buttons */}
         <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
           <button
-            type="button"
-            onClick={onCancel}
-            className="px-8 py-3 rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300"
-            style={{
-              backgroundColor: "#E8DCC0",
-              color: "#543310",
-            }}
-          >
-            Cancel
-          </button>
-          <button
             type="submit"
-            className="px-8 py-3 rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300"
-            style={{
-              backgroundColor: "#74512D",
-              color: "#F8F4E1",
-            }}
+            className="px-8 py-3 bg-[#74512D] text-[#F8F4E1] rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             {initialData ? "Update Goal" : "Create Goal"}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-8 py-3 bg-[#E8DCC0] text-[#543310] rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
+            Cancel
           </button>
         </div>
       </form>

@@ -10,6 +10,7 @@ const AIAssistantModal = ({
   expenses,
   totalSpent,
   totalBudget,
+  colors,
 }) => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
@@ -49,92 +50,94 @@ const AIAssistantModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black bg-opacity-50 p-0 sm:p-4">
-      <div className="w-full sm:max-w-2xl bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      style={{ backgroundColor: colors.overlay }} // dark/light overlay from your colors
+    >
+      <div
+        className="w-full sm:max-w-2xl rounded-t-3xl sm:rounded-2xl shadow-2xl animate-slide-up max-h-[90vh] flex flex-col"
+        style={{ backgroundColor: colors.cardBg }}
+      >
         {/* Header */}
         <div
           className="flex items-center justify-between p-4 sm:p-6 border-b"
-          style={{ backgroundColor: "#F8F4E1", borderColor: "#AF8F6F" }}
+          style={{ backgroundColor: colors.cardBg, borderColor: colors.border }}
         >
           <div className="flex items-center space-x-3">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: "#74512D" }}
+              style={{ backgroundColor: colors.accent }}
             >
               <Bot className="w-5 h-5" style={{ color: "#F8F4E1" }} />
             </div>
             <div>
               <h2
                 className="text-lg sm:text-xl font-bold"
-                style={{ color: "#543310" }}
+                style={{ color: colors.text }}
               >
                 AI Assistant
               </h2>
-              <p className="text-sm opacity-70" style={{ color: "#74512D" }}>
+              <p className="text-sm opacity-80" style={{ color: colors.text }}>
                 Smart financial insights
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-opacity-20 hover:bg-amber-800 transition-colors group"
+            className="p-2 rounded-xl hover:bg-opacity-20 hover:bg-amber-800 transition-colors group cursor-pointer"
           >
-            <X className="w-5 h-5 text-[#74512D] group-hover:text-white transition-colors" />
+            <X className="w-5 h-5" style={{ color: colors.text }} />
           </button>
         </div>
 
         {/* Tabs */}
         <div
           className="flex border-b"
-          style={{ backgroundColor: "#F8F4E1", borderColor: "#E8DCC0" }}
+          style={{ backgroundColor: colors.cardBg, borderColor: colors.border }}
         >
-          <button
-            onClick={() => {
-              setActiveTab("insights");
-              setResponse("");
-            }}
-            className={`flex-1 p-4 text-sm font-medium flex items-center justify-center space-x-2 transition-colors ${
-              activeTab === "insights" ? "border-b-2" : ""
-            }`}
-            style={{
-              color: activeTab === "insights" ? "#543310" : "#74512D",
-              borderColor: activeTab === "insights" ? "#74512D" : "transparent",
-            }}
-          >
-            <TrendingUp className="w-4 h-4" />
-            <span>Smart Insights</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("advice");
-              setResponse("");
-            }}
-            className={`flex-1 p-4 text-sm font-medium flex items-center justify-center space-x-2 transition-colors ${
-              activeTab === "advice" ? "border-b-2" : ""
-            }`}
-            style={{
-              color: activeTab === "advice" ? "#543310" : "#74512D",
-              borderColor: activeTab === "advice" ? "#74512D" : "transparent",
-            }}
-          >
-            <Lightbulb className="w-4 h-4" />
-            <span>Budgeting Tips</span>
-          </button>
+          {["insights", "advice"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setResponse("");
+              }}
+              className={`flex-1 p-4 text-sm font-medium flex items-center justify-center space-x-2 transition-colors cursor-pointer ${
+                activeTab === tab ? "border-b-2" : ""
+              }`}
+              style={{
+                color: colors.text,
+                borderColor: activeTab === tab ? colors.accent : "transparent",
+              }}
+            >
+              {tab === "insights" ? (
+                <>
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Smart Insights</span>
+                </>
+              ) : (
+                <>
+                  <Lightbulb className="w-4 h-4" />
+                  <span>Budgeting Tips</span>
+                </>
+              )}
+            </button>
+          ))}
         </div>
 
         {/* Content */}
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
           {activeTab === "insights" && (
             <div className="space-y-4">
-              <p className="text-sm" style={{ color: "#74512D" }}>
+              <p className="text-sm" style={{ color: colors.text }}>
                 Get personalized insights about your spending patterns and
                 budget performance.
               </p>
               <button
                 onClick={handleGetInsights}
                 disabled={loading || Object.keys(budgets).length === 0}
-                className="w-full p-4 rounded-xl font-medium flex items-center justify-center space-x-2 transition-all disabled:opacity-50"
-                style={{ backgroundColor: "#AF8F6F", color: "#F8F4E1" }}
+                className="w-full p-4 rounded-xl font-medium flex items-center justify-center space-x-2 transition-all disabled:opacity-50 cursor-pointer"
+                style={{ backgroundColor: colors.accent, color: "#F8F4E1" }}
               >
                 {loading ? (
                   <Loader className="w-4 h-4 animate-spin" />
@@ -148,7 +151,7 @@ const AIAssistantModal = ({
 
           {activeTab === "advice" && (
             <div className="space-y-4">
-              <p className="text-sm" style={{ color: "#74512D" }}>
+              <p className="text-sm" style={{ color: colors.text }}>
                 Receive personalized budgeting advice based on your spending
                 habits.
               </p>
@@ -156,7 +159,7 @@ const AIAssistantModal = ({
                 onClick={handleGetAdvice}
                 disabled={loading || Object.keys(expenses).length === 0}
                 className="w-full p-4 rounded-xl font-medium flex items-center justify-center space-x-2 transition-all disabled:opacity-50"
-                style={{ backgroundColor: "#B8906B", color: "#F8F4E1" }}
+                style={{ backgroundColor: colors.accent, color: "#F8F4E1" }}
               >
                 {loading ? (
                   <Loader className="w-4 h-4 animate-spin" />
@@ -173,18 +176,18 @@ const AIAssistantModal = ({
             <div
               className="mt-6 p-4 rounded-xl"
               style={{
-                backgroundColor: "#F8F4E1",
-                border: "1px solid #E8DCC0",
+                backgroundColor: colors.cardBg,
+                border: `1px solid ${colors.border}`,
               }}
             >
               <div className="flex items-start space-x-3">
                 <Bot
                   className="w-5 h-5 mt-0.5 flex-shrink-0"
-                  style={{ color: "#74512D" }}
+                  style={{ color: colors.text }}
                 />
                 <div
                   className="text-sm whitespace-pre-line"
-                  style={{ color: "#543310" }}
+                  style={{ color: colors.text }}
                 >
                   {response}
                 </div>

@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import AIAssistantModal from "./AIAssistantModal";
 import { Bot } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
+import { Moon, Sun } from "lucide-react";
 import {
   Plus,
   Minus,
@@ -12,6 +14,7 @@ import {
   Clock,
   FileText,
   Target,
+  LogOut,
 } from "lucide-react";
 import {
   SummaryCardsSkeleton,
@@ -55,6 +58,8 @@ const Dashboard = ({ user, onLogout }) => {
   const [goalsLoading, setGoalsLoading] = useState(true);
 
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+
+  const { isDarkMode, toggleTheme, colors } = useTheme();
 
   // Refs for auto-scroll
   const budgetFormRef = useRef(null);
@@ -343,13 +348,16 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: "white" }}>
+    <div
+      className="min-h-screen relative"
+      style={{ backgroundColor: colors.background }}
+    >
       {/* Enhanced Header with Mobile Optimization and Brown Theme */}
       <header
         className="shadow-lg border-b sticky top-0 z-40 transition-all duration-300"
         style={{
-          backgroundColor: "#F8F4E1",
-          borderBottomColor: "#AF8F6F",
+          backgroundColor: colors.surface,
+          borderBottomColor: colors.border,
         }}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
@@ -371,16 +379,16 @@ const Dashboard = ({ user, onLogout }) => {
                 <div className="min-w-0 flex-1">
                   <h1
                     className="text-base sm:text-2xl font-bold truncate"
-                    style={{ color: "#543310" }}
+                    style={{ color: colors.text }}
                   >
                     Expense Tracker
                   </h1>
                   {/* Mobile Date and Time - Always Visible */}
                   <div className="lg:hidden flex items-center space-x-1 mt-0.5">
-                    <Clock className="w-3 h-3" style={{ color: "#74512D" }} />
+                    <Clock className="w-3 h-3" style={{ color: colors.text }} />
                     <span
                       className="text-xs font-medium"
-                      style={{ color: "#74512D" }}
+                      style={{ color: colors.text }}
                     >
                       {formatMobileDate(currentDateTime)} •{" "}
                       {formatMobileTime(currentDateTime)}
@@ -392,12 +400,32 @@ const Dashboard = ({ user, onLogout }) => {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-4">
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
+                style={{
+                  backgroundColor: colors.accent,
+                  color: colors.text,
+                }}
+                title={`Switch to ${isDarkMode ? "Light" : "Dark"} Mode`}
+              >
+                {isDarkMode ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+                <span className="text-sm font-medium">
+                  {isDarkMode ? "Light" : "Dark"}
+                </span>
+              </button>
+
               {/* Combined Date and Time Display */}
               <div
                 className="flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm transform hover:scale-105 transition-all duration-300"
                 style={{
-                  backgroundColor: "#E8DCC0",
-                  color: "#543310",
+                  backgroundColor: colors.surface,
+                  color: colors.text,
                 }}
               >
                 <span className="text-sm font-medium">
@@ -409,10 +437,10 @@ const Dashboard = ({ user, onLogout }) => {
               <button
                 onClick={() => setShowExportReport(true)}
                 disabled={Object.keys(budgets).length === 0}
-                className="flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 style={{
-                  backgroundColor: "#AF8F6F",
-                  color: "#F8F4E1",
+                  backgroundColor: colors.buttonPrimary,
+                  color: colors.text,
                 }}
                 title="Export Report"
               >
@@ -423,18 +451,18 @@ const Dashboard = ({ user, onLogout }) => {
               <span
                 className="text-sm max-w-[150px] truncate px-3 py-2 rounded-lg"
                 style={{
-                  color: "#543310",
-                  backgroundColor: "#E8DCC0",
+                  color: colors.text,
+                  backgroundColor: colors.surface,
                 }}
               >
                 Welcome, {user.email}
               </span>
               <button
                 onClick={handleSignOut}
-                className="px-5 py-2.5 rounded-xl font-medium shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 whitespace-nowrap"
+                className="px-5 py-2.5 rounded-xl font-medium shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 whitespace-nowrap cursor-pointer"
                 style={{
-                  backgroundColor: "#B8906B",
-                  color: "#543310",
+                  backgroundColor: colors.buttonSecondary,
+                  color: colors.text,
                 }}
               >
                 Sign Out
@@ -447,8 +475,8 @@ const Dashboard = ({ user, onLogout }) => {
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2.5 sm:p-3 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 flex-shrink-0"
                 style={{
-                  backgroundColor: "#AF8F6F",
-                  color: "#F8F4E1",
+                  backgroundColor: colors.accent,
+                  color: "white",
                 }}
               >
                 {mobileMenuOpen ? (
@@ -463,49 +491,77 @@ const Dashboard = ({ user, onLogout }) => {
           {/* Mobile Navigation Menu - Enhanced */}
           {mobileMenuOpen && (
             <div
-              className="lg:hidden border-t py-4 px-3 space-y-4 animate-slide-down"
+              className="lg:hidden animate-slide-down px-4 py-6 space-y-6"
               style={{
-                backgroundColor: "#F8F4E1",
-                borderTopColor: "#AF8F6F",
+                backgroundColor: colors.surface,
+                borderTop: `1px solid ${colors.border}`,
+                borderRadius: "0 0 1rem 1rem",
               }}
             >
               {/* User Info */}
               <div
-                className="text-sm truncate px-3 py-2 rounded-lg text-center"
+                className="text-center p-3 rounded-xl font-medium"
                 style={{
-                  color: "#543310",
-                  backgroundColor: "#E8DCC0",
+                  backgroundColor: colors.cardBg,
+                  color: colors.text,
                 }}
               >
-                Welcome, {user.email}
+                👋 Welcome, {user.email}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3">
+              {/* Actions Grid */}
+              <div className="grid grid-cols-1 gap-4">
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: isDarkMode ? "#F8F4E1" : "#ffffff",
+                  }}
+                >
+                  <span className="flex items-center gap-2">
+                    {isDarkMode ? (
+                      <Sun className="w-4 h-4" />
+                    ) : (
+                      <Moon className="w-4 h-4" />
+                    )}
+                    {isDarkMode ? "Light Mode" : "Dark Mode"}
+                  </span>
+                </button>
+
+                {/* Export Report */}
                 <button
                   onClick={() => {
                     setShowExportReport(true);
                     setMobileMenuOpen(false);
                   }}
                   disabled={Object.keys(budgets).length === 0}
-                  className="flex items-center justify-center space-x-2 px-4 py-3 rounded-xl hover:shadow-md transition-all duration-300 disabled:opacity-50"
+                  className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md disabled:opacity-50"
                   style={{
-                    backgroundColor: "#AF8F6F",
-                    color: "#F8F4E1",
+                    backgroundColor: colors.secondary,
+                    color: isDarkMode ? "#F8F4E1" : "#ffffff",
                   }}
                 >
-                  <Download className="w-4 h-4" />
-                  <span className="text-sm font-medium">Export Report</span>
+                  <span className="flex items-center gap-2">
+                    <Download className="w-4 h-4" />
+                    Export Report
+                  </span>
                 </button>
+
+                {/* Sign Out */}
                 <button
                   onClick={handleSignOut}
-                  className="px-4 py-3 rounded-xl hover:shadow-md transition-all duration-300 text-sm font-medium"
+                  className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
                   style={{
-                    backgroundColor: "#B8906B",
-                    color: "#543310",
+                    backgroundColor: colors.primary,
+                    color: isDarkMode ? "#F8F4E1" : "#ffffff",
                   }}
                 >
-                  Sign Out
+                  <span className="flex items-center gap-2">
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </span>
                 </button>
               </div>
             </div>
@@ -515,67 +571,178 @@ const Dashboard = ({ user, onLogout }) => {
 
       {/* Main Content with Enhanced Mobile Padding */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8 lg:py-10 pb-24 lg:pb-10">
-        {/* Summary Cards - Enhanced with Brown Theme and Animations */}
+        {/* Summary Cards - Enhanced with Brown Theme and Horizontal Scroll for Mobile */}
         {isLoading ? (
           <SummaryCardsSkeleton />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10">
-            {/* Your existing summary cards code */}
-            <div
-              className="rounded-2xl p-6 sm:p-8 shadow-lg transform hover:scale-105 transition-all duration-300"
-              style={{
-                backgroundColor: "#D4C4A8",
-                color: "#543310",
-              }}
-            >
-              <p className="text-sm sm:text-base font-medium opacity-80 mb-2">
-                Total Budget
-              </p>
-              <p className="text-2xl sm:text-3xl font-bold">
-                ₱{totalBudget.toFixed(2)}
-              </p>
+          <>
+            {/* Mobile Horizontal Scroll Cards */}
+            <div className="lg:hidden mb-8">
+              <div className="flex space-x-4 overflow-x-auto scrollbar-hide px-1 py-2">
+                {/* Total Budget Card */}
+                <div className="flex-shrink-0 w-64 sm:w-72">
+                  <div
+                    className="rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
+                    style={{
+                      backgroundColor: colors.summaryCard1,
+                      color: colors.text,
+                    }}
+                  >
+                    {/* Background Icon */}
+                    <div className="absolute top-4 right-4 opacity-20">
+                      <svg
+                        className="w-8 h-8"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="relative z-10">
+                      <p className="text-sm font-medium opacity-80 mb-2">
+                        Total Budget
+                      </p>
+                      <p className="text-2xl font-bold">
+                        ₱{totalBudget.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Total Spent Card */}
+                <div className="flex-shrink-0 w-64 sm:w-72">
+                  <div
+                    className="rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
+                    style={{
+                      backgroundColor: colors.summaryCard2,
+                      color: colors.text,
+                    }}
+                  >
+                    {/* Background Icon */}
+                    <div className="absolute top-4 right-4 opacity-20">
+                      <svg
+                        className="w-8 h-8"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="relative z-10">
+                      <p className="text-sm font-medium opacity-80 mb-2">
+                        Total Spent
+                      </p>
+                      <p className="text-2xl font-bold">
+                        ₱{totalSpent.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Remaining Card */}
+                <div className="flex-shrink-0 w-64 sm:w-72">
+                  <div
+                    className="rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
+                    style={{
+                      backgroundColor: colors.summaryCard3,
+                      color: colors.text,
+                    }}
+                  >
+                    {/* Background Icon */}
+                    <div className="absolute top-4 right-4 opacity-20">
+                      <svg
+                        className="w-8 h-8"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="relative z-10">
+                      <p className="text-sm font-medium opacity-90 mb-2">
+                        Remaining
+                      </p>
+                      <p className="text-2xl font-bold">
+                        ₱{(totalBudget - totalSpent).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div
-              className="rounded-2xl p-6 sm:p-8 shadow-lg transform hover:scale-105 transition-all duration-300"
-              style={{
-                backgroundColor: "#B8906B",
-                color: "#543310",
-              }}
-            >
-              <p className="text-sm sm:text-base font-medium opacity-80 mb-2">
-                Total Spent
-              </p>
-              <p className="text-2xl sm:text-3xl font-bold">
-                ₱{totalSpent.toFixed(2)}
-              </p>
+
+            {/* Desktop Grid Layout (unchanged) */}
+            <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10">
+              <div
+                className="rounded-2xl p-6 sm:p-8 shadow-lg transform hover:scale-105 transition-all duration-300"
+                style={{
+                  backgroundColor: colors.summaryCard1,
+                  color: colors.text,
+                }}
+              >
+                <p className="text-sm sm:text-base font-medium opacity-80 mb-2">
+                  Total Budget
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold">
+                  ₱{totalBudget.toFixed(2)}
+                </p>
+              </div>
+              <div
+                className="rounded-2xl p-6 sm:p-8 shadow-lg transform hover:scale-105 transition-all duration-300"
+                style={{
+                  backgroundColor: colors.summaryCard2,
+                  color: colors.text,
+                }}
+              >
+                <p className="text-sm sm:text-base font-medium opacity-80 mb-2">
+                  Total Spent
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold">
+                  ₱{totalSpent.toFixed(2)}
+                </p>
+              </div>
+              <div
+                className="rounded-2xl p-6 sm:p-8 shadow-lg transform hover:scale-105 transition-all duration-300 sm:col-span-2 lg:col-span-1"
+                style={{
+                  backgroundColor: colors.summaryCard3,
+                  color: colors.text,
+                }}
+              >
+                <p className="text-sm sm:text-base font-medium opacity-90 mb-2">
+                  Remaining
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold">
+                  ₱{(totalBudget - totalSpent).toFixed(2)}
+                </p>
+              </div>
             </div>
-            <div
-              className="rounded-2xl p-6 sm:p-8 shadow-lg transform hover:scale-105 transition-all duration-300 sm:col-span-2 lg:col-span-1"
-              style={{
-                backgroundColor: "#AF8F6F",
-                color: "#F8F4E1",
-              }}
-            >
-              <p className="text-sm sm:text-base font-medium opacity-90 mb-2">
-                Remaining
-              </p>
-              <p className="text-2xl sm:text-3xl font-bold">
-                ₱{(totalBudget - totalSpent).toFixed(2)}
-              </p>
-            </div>
-          </div>
+          </>
         )}
 
         {/* Desktop Action Buttons - Only show on desktop */}
         <div className="hidden lg:flex flex-row gap-6 mb-8">
           <button
             onClick={handleBudgetFormToggle}
-            className={`px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
+            className={`px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer ${
               showBudgetForm ? "scale-105 shadow-xl" : ""
             }`}
             style={{
-              backgroundColor: showBudgetForm ? "#74512D" : "#AF8F6F",
-              color: "#F8F4E1",
+              backgroundColor: showBudgetForm
+                ? "#74512D"
+                : colors.buttonPrimary,
+              color: showBudgetForm ? "#F8F4E1" : colors.text,
             }}
           >
             <Plus className="w-6 h-6 mr-3" />
@@ -584,12 +751,14 @@ const Dashboard = ({ user, onLogout }) => {
           <button
             onClick={handleExpenseFormToggle}
             disabled={Object.keys(budgets).length === 0}
-            className={`px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
               showExpenseForm ? "scale-105 shadow-xl" : ""
             }`}
             style={{
-              backgroundColor: showExpenseForm ? "#74512D" : "#B8906B",
-              color: showExpenseForm ? "#F8F4E1" : "#543310",
+              backgroundColor: showExpenseForm
+                ? "#74512D"
+                : colors.buttonPrimary,
+              color: showExpenseForm ? "#F8F4E1" : colors.text,
             }}
           >
             <Minus className="w-6 h-6 mr-3" />
@@ -597,7 +766,7 @@ const Dashboard = ({ user, onLogout }) => {
           </button>
           <button
             onClick={handleGoalFormToggle}
-            className={`px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ${
+            className={`px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer ${
               showGoalForm ? "scale-105 shadow-xl" : ""
             }`}
             style={{
@@ -614,7 +783,7 @@ const Dashboard = ({ user, onLogout }) => {
               Object.keys(budgets).length === 0 &&
               Object.keys(expenses).length === 0
             }
-            className="px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50"
+            className="px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 cursor-pointer"
             style={{
               backgroundColor: "#74512D",
               color: "#F8F4E1",
@@ -630,6 +799,7 @@ const Dashboard = ({ user, onLogout }) => {
           {/* AI Assistant Modal */}
           {showAIAssistant && (
             <AIAssistantModal
+              colors={colors}
               isOpen={showAIAssistant}
               onClose={() => setShowAIAssistant(false)}
               budgets={budgets}
@@ -643,11 +813,12 @@ const Dashboard = ({ user, onLogout }) => {
               ref={budgetFormRef}
               className="p-6 sm:p-8 rounded-2xl shadow-xl border-2 animate-slide-down"
               style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#AF8F6F",
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border,
               }}
             >
               <BudgetForm
+                colors={colors}
                 onSubmit={handleAddBudget}
                 onCancel={closeMobileActions}
               />
@@ -658,11 +829,12 @@ const Dashboard = ({ user, onLogout }) => {
               ref={budgetFormRef}
               className="p-6 sm:p-8 rounded-2xl shadow-xl border-2 animate-slide-down"
               style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#74512D",
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border,
               }}
             >
               <BudgetForm
+                colors={colors}
                 initialData={editingBudget}
                 onSubmit={handleEditBudget}
                 onCancel={() => setEditingBudget(null)}
@@ -674,11 +846,12 @@ const Dashboard = ({ user, onLogout }) => {
               ref={expenseFormRef}
               className="p-6 sm:p-8 rounded-2xl shadow-xl border-2 animate-slide-down"
               style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#B8906B",
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border,
               }}
             >
               <ExpenseForm
+                colors={colors}
                 budgets={budgets}
                 onSubmit={handleAddExpense}
                 onCancel={closeMobileActions}
@@ -690,11 +863,12 @@ const Dashboard = ({ user, onLogout }) => {
               ref={budgetFormRef}
               className="p-6 sm:p-8 rounded-2xl shadow-xl border-2 animate-slide-down"
               style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#D4C4A8",
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border,
               }}
             >
               <GoalForm
+                colors={colors}
                 onSubmit={handleAddGoal}
                 onCancel={closeMobileActions}
               />
@@ -705,11 +879,12 @@ const Dashboard = ({ user, onLogout }) => {
               ref={budgetFormRef}
               className="p-6 sm:p-8 rounded-2xl shadow-xl border-2 animate-slide-down"
               style={{
-                backgroundColor: "#F8F4E1",
-                borderColor: "#74512D",
+                backgroundColor: colors.cardBg,
+                borderColor: colors.border,
               }}
             >
               <GoalForm
+                colors={colors}
                 initialData={editingGoal}
                 onSubmit={handleEditGoal}
                 onCancel={() => setEditingGoal(null)}
@@ -727,7 +902,7 @@ const Dashboard = ({ user, onLogout }) => {
             <div className="space-y-6">
               <h2
                 className="text-xl sm:text-2xl font-bold"
-                style={{ color: "#543310" }}
+                style={{ color: colors.text }}
               >
                 Your Budgets
               </h2>
@@ -735,13 +910,13 @@ const Dashboard = ({ user, onLogout }) => {
                 <div
                   className="p-8 sm:p-12 rounded-2xl shadow-lg text-center"
                   style={{
-                    backgroundColor: "#F8F4E1",
-                    border: `2px dashed #AF8F6F`,
+                    backgroundColor: colors.cardBg,
+                    borderColor: colors.border,
                   }}
                 >
                   <p
                     className="text-base sm:text-lg font-medium"
-                    style={{ color: "#74512D" }}
+                    style={{ color: colors.text }}
                   >
                     No budgets yet. Create your first one!
                   </p>
@@ -758,6 +933,7 @@ const Dashboard = ({ user, onLogout }) => {
                       }}
                     >
                       <BudgetCard
+                        colors={colors}
                         budget={budget}
                         onEdit={() => handleEditClick(budget)}
                         onDelete={() => handleDeleteBudget(id)}
@@ -772,12 +948,13 @@ const Dashboard = ({ user, onLogout }) => {
           {/* Expenses Section - Reduced padding for mobile */}
           <div
             className="rounded-2xl shadow-lg p-1 sm:p-6 md:p-8"
-            style={{ backgroundColor: "#F8F4E1" }}
+            style={{ backgroundColor: colors.cardBg }}
           >
             {expensesLoading ? (
               <ExpensesSkeleton />
             ) : (
               <ExpenseList
+                colors={colors}
                 expenses={expenses}
                 budgets={budgets}
                 onDelete={handleDeleteExpense}
@@ -792,7 +969,7 @@ const Dashboard = ({ user, onLogout }) => {
             <div className="space-y-6 xl:col-span-2">
               <h2
                 className="text-xl sm:text-2xl font-bold"
-                style={{ color: "#543310" }}
+                style={{ color: colors.text }}
               >
                 Your Goals
               </h2>
@@ -800,13 +977,13 @@ const Dashboard = ({ user, onLogout }) => {
                 <div
                   className="p-8 sm:p-12 rounded-2xl shadow-lg text-center"
                   style={{
-                    backgroundColor: "#F8F4E1",
-                    border: `2px dashed #D4C4A8`,
+                    backgroundColor: colors.cardBg,
+                    borderColor: colors.border,
                   }}
                 >
                   <p
                     className="text-base sm:text-lg font-medium"
-                    style={{ color: "#74512D" }}
+                    style={{ color: colors.text }}
                   >
                     No goals yet. Set your first savings target!
                   </p>
@@ -818,11 +995,12 @@ const Dashboard = ({ user, onLogout }) => {
                       key={id}
                       className="rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in"
                       style={{
-                        backgroundColor: "#F8F4E1",
+                        backgroundColor: colors.cardBg,
                         animationDelay: `${index * 100}ms`,
                       }}
                     >
                       <GoalCard
+                        colors={colors}
                         goal={goal}
                         onEdit={() => handleGoalEditClick(goal)}
                         onDelete={() => handleDeleteGoal(id)}
@@ -841,7 +1019,8 @@ const Dashboard = ({ user, onLogout }) => {
         {/* FAB Menu Background Overlay */}
         {showFABMenu && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-30 z-40 animate-fade-in"
+            style={{ backgroundColor: colors.overlay }}
+            className="fixed inset-0 bg-opacity-30 z-40 animate-fade-in"
             onClick={() => setShowFABMenu(false)}
           />
         )}
@@ -854,8 +1033,8 @@ const Dashboard = ({ user, onLogout }) => {
               <div
                 className="px-3 py-2 rounded-full shadow-lg"
                 style={{
-                  backgroundColor: "#F8F4E1",
-                  color: "#543310",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <span className="text-sm font-medium whitespace-nowrap">
@@ -870,8 +1049,8 @@ const Dashboard = ({ user, onLogout }) => {
                 disabled={Object.keys(budgets).length === 0}
                 className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform hover:scale-110 transition-all duration-300 disabled:opacity-50"
                 style={{
-                  backgroundColor: "#D4C4A8",
-                  color: "#543310",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <FileText className="w-5 h-5" />
@@ -883,8 +1062,8 @@ const Dashboard = ({ user, onLogout }) => {
               <div
                 className="px-3 py-2 rounded-full shadow-lg"
                 style={{
-                  backgroundColor: "#F8F4E1",
-                  color: "#543310",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <span className="text-sm font-medium whitespace-nowrap">
@@ -902,8 +1081,8 @@ const Dashboard = ({ user, onLogout }) => {
                 }
                 className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform hover:scale-110 transition-all duration-300 disabled:opacity-50"
                 style={{
-                  backgroundColor: "#74512D",
-                  color: "#F8F4E1",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <Bot className="w-5 h-5" />
@@ -915,8 +1094,8 @@ const Dashboard = ({ user, onLogout }) => {
               <div
                 className="px-3 py-2 rounded-full shadow-lg"
                 style={{
-                  backgroundColor: "#F8F4E1",
-                  color: "#543310",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <span className="text-sm font-medium whitespace-nowrap">
@@ -927,8 +1106,8 @@ const Dashboard = ({ user, onLogout }) => {
                 onClick={handleGoalFormToggle}
                 className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform hover:scale-110 transition-all duration-300"
                 style={{
-                  backgroundColor: "#D4C4A8",
-                  color: "#543310",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <Target className="w-5 h-5" />
@@ -939,8 +1118,8 @@ const Dashboard = ({ user, onLogout }) => {
               <div
                 className="px-3 py-2 rounded-full shadow-lg"
                 style={{
-                  backgroundColor: "#F8F4E1",
-                  color: "#543310",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <span className="text-sm font-medium whitespace-nowrap">
@@ -952,8 +1131,8 @@ const Dashboard = ({ user, onLogout }) => {
                 disabled={Object.keys(budgets).length === 0}
                 className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform hover:scale-110 transition-all duration-300 disabled:opacity-50"
                 style={{
-                  backgroundColor: "#B8906B",
-                  color: "#F8F4E1",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <Minus className="w-5 h-5" />
@@ -964,8 +1143,8 @@ const Dashboard = ({ user, onLogout }) => {
               <div
                 className="px-3 py-2 rounded-full shadow-lg"
                 style={{
-                  backgroundColor: "#F8F4E1",
-                  color: "#543310",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <span className="text-sm font-medium whitespace-nowrap">
@@ -976,8 +1155,8 @@ const Dashboard = ({ user, onLogout }) => {
                 onClick={handleBudgetFormToggle}
                 className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform hover:scale-110 transition-all duration-300"
                 style={{
-                  backgroundColor: "#AF8F6F",
-                  color: "#F8F4E1",
+                  backgroundColor: colors.fabBg,
+                  color: "white",
                 }}
               >
                 <Plus className="w-5 h-5" />
@@ -993,8 +1172,11 @@ const Dashboard = ({ user, onLogout }) => {
             showFABMenu ? "rotate-45 scale-110" : "hover:scale-110"
           }`}
           style={{
-            backgroundColor: showFABMenu ? "#74512D" : "#AF8F6F",
-            color: "#F8F4E1",
+            backgroundColor: colors.fabBg,
+            color:
+              showFABMenu && !isDarkMode
+                ? "white" // red in light mode when active
+                : colors.text,
           }}
         >
           <Plus className="w-6 h-6" />
@@ -1004,6 +1186,7 @@ const Dashboard = ({ user, onLogout }) => {
       {/* Export Report Modal */}
       {showExportReport && (
         <ExportReport
+          colors={colors}
           budgets={budgets}
           expenses={expenses}
           user={user}
@@ -1013,45 +1196,60 @@ const Dashboard = ({ user, onLogout }) => {
 
       {/* Enhanced Modal with Traditional Background */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-70 p-4 animate-fade-in">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
+          style={{
+            backgroundColor: colors.overlay, // uses your theme’s overlay
+          }}
+        >
           <div
-            className="p-6 sm:p-8 rounded-2xl shadow-2xl max-w-sm w-full border-2 transform scale-100 animate-scale-in"
+            className="p-6 sm:p-8 rounded-2xl shadow-2xl max-w-sm w-full border-2 transform scale-100 animate-scale-in transition-all"
             style={{
-              backgroundColor: "#F8F4E1",
-              borderColor: "#AF8F6F",
+              backgroundColor: colors.cardBg,
+              borderColor: colors.border,
             }}
           >
             <h2
               className="text-lg sm:text-xl font-bold mb-3"
-              style={{ color: "#543310" }}
+              style={{ color: colors.text }}
             >
               {modalTitle}
             </h2>
+
             {modalMessage && (
-              <p className="text-sm mb-6" style={{ color: "#74512D" }}>
+              <p
+                className="text-sm mb-6 opacity-90"
+                style={{ color: colors.text }}
+              >
                 {modalMessage}
               </p>
             )}
+
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4">
+              {/* Cancel Button */}
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-6 py-3 rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 text-sm sm:text-base"
+                className="px-6 py-3 rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 text-sm sm:text-base border cursor-pointer"
                 style={{
-                  backgroundColor: "#E8DCC0",
-                  color: "#543310",
+                  backgroundColor: colors.cardBg,
+                  color: colors.text,
+                  borderColor: colors.border,
                 }}
               >
                 Cancel
               </button>
+
+              {/* Confirm / Sign Out Button */}
               <button
                 onClick={() => {
                   confirmAction();
                   setModalOpen(false);
                 }}
-                className="px-6 py-3 rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 text-sm sm:text-base"
+                className="px-6 py-3 rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 text-sm sm:text-base border cursor-pointer"
                 style={{
-                  backgroundColor: "#B8906B",
-                  color: "#543310",
+                  backgroundColor: colors.accent,
+                  color: colors.text,
+                  borderColor: colors.border,
                 }}
               >
                 {modalTitle === "Sign Out" ? "Sign Out" : "Confirm"}
@@ -1062,7 +1260,7 @@ const Dashboard = ({ user, onLogout }) => {
       )}
 
       {/* Add Custom CSS for Animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes slide-down {
           from {
             opacity: 0;
@@ -1163,6 +1361,30 @@ const Dashboard = ({ user, onLogout }) => {
 
         ::-webkit-scrollbar-thumb:hover {
           background: #74512d;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+
+        /* Smooth horizontal scrolling */
+        .scrollbar-hide {
+          scroll-behavior: smooth;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* Card hover effects for mobile */
+        @media (max-width: 1024px) {
+          .summary-card:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease-in-out;
+          }
         }
       `}</style>
       <SkeletonStyles />

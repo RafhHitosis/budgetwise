@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const BudgetForm = ({ onSubmit, onCancel, initialData = null }) => {
+const BudgetForm = ({ colors, onSubmit, onCancel, initialData = null }) => {
   const [name, setName] = useState(initialData?.name || "");
   const [amount, setAmount] = useState(initialData?.amount || "");
 
@@ -16,15 +16,16 @@ const BudgetForm = ({ onSubmit, onCancel, initialData = null }) => {
   };
 
   return (
-    <div className="bg-[#F3E5D8] rounded-xl shadow-lg p-6">
-      <h3 className="text-lg font-semibold text-[#543310] mb-4">
+    <div
+      style={{ backgroundColor: colors.cardBg, color: colors.text }}
+      className="rounded-xl shadow-lg p-6"
+    >
+      <h3 className="text-lg font-semibold mb-4">
         {initialData ? "Edit Budget" : "Add New Budget"}
       </h3>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[#543310] mb-2">
-            Budget Name
-          </label>
+          <label className="block text-sm font-medium mb-2">Budget Name</label>
           <input
             type="text"
             value={name}
@@ -36,9 +37,7 @@ const BudgetForm = ({ onSubmit, onCancel, initialData = null }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#543310] mb-2">
-            Amount
-          </label>
+          <label className="block text-sm font-medium mb-2">Amount</label>
           <input
             type="number"
             step="0.01"
@@ -53,13 +52,13 @@ const BudgetForm = ({ onSubmit, onCancel, initialData = null }) => {
         <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-[#B8906B] text-white py-3 px-4 rounded-lg whitespace-nowrap hover:bg-[#a97c59]"
+            className="flex-1 bg-[#74512D] text-white py-3 px-4 rounded-lg whitespace-nowrap hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
           >
             {initialData ? "Update" : "Add"} Budget
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg whitespace-nowrap hover:bg-[#d4c3b0]"
+            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg whitespace-nowrap hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
           >
             Cancel
           </button>

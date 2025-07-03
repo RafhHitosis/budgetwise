@@ -13,19 +13,21 @@ const Skeleton = ({ className = "", style = {} }) => (
   />
 );
 
-// Summary Cards Skeleton
+// Summary Cards Skeleton - Updated to horizontal scroll
 export const SummaryCardsSkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10">
-    {[1, 2, 3].map((i) => (
-      <div
-        key={i}
-        className="rounded-2xl p-6 sm:p-8 shadow-lg"
-        style={{ backgroundColor: "#F8F4E1" }}
-      >
-        <Skeleton className="h-4 w-20 mb-2" />
-        <Skeleton className="h-8 w-32" />
-      </div>
-    ))}
+  <div className="mb-8 sm:mb-10">
+    <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 scrollbar-hide">
+      {[1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="rounded-2xl p-6 sm:p-8 shadow-lg flex-shrink-0 min-w-[280px] sm:min-w-[320px]"
+          style={{ backgroundColor: "#F8F4E1" }}
+        >
+          <Skeleton className="h-4 w-20 mb-2" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+      ))}
+    </div>
   </div>
 );
 
@@ -230,7 +232,7 @@ export const DashboardSkeleton = () => (
 
 // Shimmer Animation CSS
 export const SkeletonStyles = () => (
-  <style jsx>{`
+  <style>{`
     @keyframes shimmer {
       0% {
         background-position: -200px 0;
@@ -291,6 +293,15 @@ export const SkeletonStyles = () => (
     .skeleton-wave {
       position: relative;
       overflow: hidden;
+    }
+
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
     }
   `}</style>
 );

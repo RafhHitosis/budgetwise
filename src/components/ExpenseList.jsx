@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const ExpenseList = ({ expenses, budgets, onDelete }) => {
+const ExpenseList = ({ expenses, budgets, onDelete, colors }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [filterBudget, setFilterBudget] = useState("all");
@@ -297,15 +297,24 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
   };
 
   return (
-    <div className="bg-amber-50 rounded-xl shadow-sm border border-amber-200 overflow-hidden">
+    <div
+      style={{
+        backgroundColor: colors.cardBg,
+        borderColor: colors.borderExpense,
+      }}
+      className=" rounded-xl shadow-sm border overflow-hidden"
+    >
       {/* Header */}
-      <div className="p-3 sm:p-6 border-b border-amber-200">
+      <div
+        style={{ borderColor: colors.borderExpense }}
+        className="p-3 sm:p-6 border-b"
+      >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start space-x-2 sm:space-x-3 min-w-0 flex-1">
             {isInCategoryView && (
               <button
                 onClick={handleBackToCategories}
-                className="p-1.5 sm:p-2 hover:bg-amber-100 rounded-lg transition-colors flex-shrink-0 mt-0.5"
+                className="p-1.5 sm:p-2 rounded-lg transition-colors flex-shrink-0 mt-0.5"
                 title={
                   searchTerm ||
                   filterDateRange !== "all" ||
@@ -314,16 +323,25 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                     : "Back to categories"
                 }
               >
-                <ArrowLeft className="w-4 h-4 text-amber-600" />
+                <ArrowLeft
+                  style={{ color: colors.text }}
+                  className="w-4 h-4 cursor-pointer"
+                />
               </button>
             )}
             <div className="min-w-0 flex-1">
-              <h3 className="text-base sm:text-lg font-semibold text-amber-900 truncate">
+              <h3
+                style={{ color: colors.text }}
+                className="text-base sm:text-lg font-semibold truncate"
+              >
                 {isInCategoryView
                   ? budgets[selectedCategory]?.name || "Category"
                   : "Recent Expenses"}
               </h3>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm text-amber-700">
+              <div
+                style={{ color: colors.text }}
+                className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm"
+              >
                 <span className="whitespace-nowrap">
                   {displayExpenses.length} expense
                   {displayExpenses.length !== 1 ? "s" : ""}
@@ -341,8 +359,16 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex-shrink-0 ${
                 showFilters
-                  ? "bg-amber-100 text-amber-700"
-                  : "bg-amber-100 text-amber-600"
+                  ? `${
+                      colors.background === "#1A1A1A"
+                        ? "bg-[#4A3426] text-[#F8F4E1]"
+                        : "bg-amber-100 text-amber-700"
+                    }`
+                  : `${
+                      colors.background === "#1A1A1A"
+                        ? "bg-[#6B4C35] text-[#F8F4E1]"
+                        : "bg-amber-100 text-amber-800"
+                    }`
               }`}
             >
               {showFilters ? (
@@ -367,20 +393,24 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
         {/* Search Bar - Always visible when not in category view or when selected category */}
         {(!shouldShowCategories || isInCategoryView) && (
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-700 w-4 h-4" />
             <input
               type="text"
               placeholder="Search expenses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 sm:py-2.5 text-sm border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent"
+              style={{ borderColor: colors.border }}
+              className="w-full pl-10 pr-4 py-2 sm:py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-800 focus:border-transparent"
             />
           </div>
         )}
 
         {/* Filters - Mobile optimized */}
         {showFilters && (!shouldShowCategories || isInCategoryView) && (
-          <div className="bg-amber-50 p-3 sm:p-4 rounded-lg space-y-3 sm:space-y-4">
+          <div
+            style={{ backgroundColor: colors.cardBg }}
+            className="p-3 sm:p-4 rounded-lg space-y-3 sm:space-y-4"
+          >
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               {/* Budget Filter - Hide when inside a specific category */}
               {!isInCategoryView && (
@@ -391,7 +421,7 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                   <select
                     value={filterBudget}
                     onChange={(e) => setFilterBudget(e.target.value)}
-                    className="w-full p-2 sm:p-2.5 text-sm border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
+                    className="w-full p-2 sm:p-2.5 text-sm border border-amber-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
                   >
                     <option value="all">All Budgets</option>
                     {Object.entries(budgets).map(([id, budget]) => (
@@ -405,37 +435,63 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
 
               {/* Date Range Filter */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-amber-700 mb-1.5 sm:mb-2">
+                <label
+                  style={{ color: colors.text }}
+                  className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2"
+                >
                   Filter by Date
                 </label>
                 <select
                   value={filterDateRange}
                   onChange={(e) => setFilterDateRange(e.target.value)}
-                  className="w-full p-2 sm:p-2.5 text-sm border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  className="w-full p-2 sm:p-2.5 text-sm border border-amber-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-800"
                 >
-                  <option value="all">All Time</option>
-                  <option value="today">Today</option>
-                  <option value="week">Last 7 Days</option>
-                  <option value="month">Last Month</option>
-                  <option value="3months">Last 3 Months</option>
+                  <option style={{ color: "brown" }} value="all">
+                    All Time
+                  </option>
+                  <option style={{ color: "brown" }} value="today">
+                    Today
+                  </option>
+                  <option style={{ color: "brown" }} value="week">
+                    Last 7 Days
+                  </option>
+                  <option style={{ color: "brown" }} value="month">
+                    Last Month
+                  </option>
+                  <option style={{ color: "brown" }} value="3months">
+                    Last 3 Months
+                  </option>
                 </select>
               </div>
 
               {/* Sort Options */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-amber-700 mb-1.5 sm:mb-2">
+                <label
+                  style={{ color: colors.text }}
+                  className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2"
+                >
                   Sort by
                 </label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-2 sm:p-2.5 text-sm border border-amber-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  className="w-full p-2 sm:p-2.5 text-sm border border-amber-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-800"
                 >
-                  <option value="date-desc">Date (Newest First)</option>
-                  <option value="date-asc">Date (Oldest First)</option>
-                  <option value="amount-desc">Amount (Highest First)</option>
-                  <option value="amount-asc">Amount (Lowest First)</option>
-                  <option value="name">Name (A-Z)</option>
+                  <option style={{ color: "brown" }} value="date-desc">
+                    Date (Newest First)
+                  </option>
+                  <option style={{ color: "brown" }} value="date-asc">
+                    Date (Oldest First)
+                  </option>
+                  <option style={{ color: "brown" }} value="amount-desc">
+                    Amount (Highest First)
+                  </option>
+                  <option style={{ color: "brown" }} value="amount-asc">
+                    Amount (Lowest First)
+                  </option>
+                  <option style={{ color: "brown" }} value="name">
+                    Name (A-Z)
+                  </option>
                 </select>
               </div>
             </div>
@@ -457,7 +513,10 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
         {shouldShowCategories ? (
           <div>
             <div className="mb-4 sm:mb-6">
-              <h4 className="text-xs sm:text-sm font-semibold text-amber-900 mb-3">
+              <h4
+                style={{ color: colors.text }}
+                className="text-xs sm:text-sm font-semibold text-amber-900 mb-3"
+              >
                 Tap a category to view expenses
               </h4>
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
@@ -466,34 +525,77 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                     <button
                       key={categoryId}
                       onClick={() => handleCategoryClick(categoryId)}
-                      className="group bg-gradient-to-br from-amber-50 to-amber-50 hover:from-amber-100 hover:to-amber-100 p-3 sm:p-4 rounded-xl border border-amber-200 hover:border-amber-300 transition-all duration-200 text-left hover:shadow-md active:scale-95"
+                      className={`group p-3 sm:p-4 rounded-xl border transition-all duration-200 text-left hover:shadow-md active:scale-95 cursor-pointer
+    ${
+      colors.background === "#1A1A1A"
+        ? "bg-[#2D2D2D] border-[#4A3426] hover:border-[#6B4C35]"
+        : "bg-gradient-to-br from-amber-50 to-amber-50 hover:from-amber-100 hover:to-amber-100 border-amber-200 hover:border-amber-300"
+    }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-semibold text-amber-900 group-hover:text-amber-900 truncate mr-2">
+                            <div
+                              className={`text-sm font-semibold truncate mr-2 ${
+                                colors.background === "#1A1A1A"
+                                  ? "text-[#F8F4E1]"
+                                  : "text-amber-900 group-hover:text-amber-900"
+                              }`}
+                            >
                               {category.name}
                             </div>
-                            <ChevronRight className="w-4 h-4 text-amber-500 group-hover:text-amber-700 flex-shrink-0" />
+                            <ChevronRight
+                              className={`w-4 h-4 flex-shrink-0 ${
+                                colors.background === "#1A1A1A"
+                                  ? "text-[#D4C4A8]"
+                                  : "text-amber-500 group-hover:text-amber-700"
+                              }`}
+                            />
                           </div>
+
                           <div className="grid grid-cols-2 gap-2 sm:gap-4">
                             <div>
-                              <div className="text-xs text-amber-600 truncate">
+                              <div
+                                className={`text-xs truncate ${
+                                  colors.background === "#1A1A1A"
+                                    ? "text-[#AF8F6F]"
+                                    : "text-amber-600"
+                                }`}
+                              >
                                 {category.expenses.length} expense
                                 {category.expenses.length !== 1 ? "s" : ""}
                               </div>
-                              <div className="text-sm sm:text-lg font-bold text-amber-700 truncate">
+                              <div
+                                className={`text-sm sm:text-lg font-bold truncate ${
+                                  colors.background === "#1A1A1A"
+                                    ? "text-[#F8F4E1]"
+                                    : "text-amber-700"
+                                }`}
+                              >
                                 ₱
                                 {category.expenses
                                   .reduce((sum, exp) => sum + exp.amount, 0)
                                   .toFixed(2)}
                               </div>
                             </div>
+
                             <div>
-                              <div className="text-xs text-amber-500">
+                              <div
+                                className={`text-xs ${
+                                  colors.background === "#1A1A1A"
+                                    ? "text-[#AF8F6F]"
+                                    : "text-amber-500"
+                                }`}
+                              >
                                 Latest:
                               </div>
-                              <div className="text-xs text-amber-600 truncate">
+                              <div
+                                className={`text-xs truncate ${
+                                  colors.background === "#1A1A1A"
+                                    ? "text-[#D4C4A8]"
+                                    : "text-amber-600"
+                                }`}
+                              >
                                 {formatDate(category.expenses[0]?.date)}
                               </div>
                             </div>
@@ -507,29 +609,94 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
             </div>
 
             {/* Quick Stats - Mobile optimized */}
-            <div className="bg-gradient-to-r from-amber-50 to-amber-50 p-3 sm:p-4 rounded-lg">
+            <div
+              className={`p-3 sm:p-4 rounded-lg ${
+                colors.background === "#1A1A1A"
+                  ? "bg-[#2D2D2D] border border-[#4A3426]"
+                  : "bg-gradient-to-r from-amber-50 to-amber-50"
+              }`}
+            >
               <div className="grid grid-cols-2 gap-3 sm:gap-4 text-center">
                 <div>
-                  <div className="text-xs text-amber-600">Categories</div>
-                  <div className="text-lg sm:text-xl font-bold text-amber-700">
+                  <div
+                    className={`text-xs ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#D4C4A8]"
+                        : "text-amber-600"
+                    }`}
+                  >
+                    Categories
+                  </div>
+                  <div
+                    className={`text-lg sm:text-xl font-bold ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#F8F4E1]"
+                        : "text-amber-700"
+                    }`}
+                  >
                     {Object.keys(expensesByCategory).length}
                   </div>
                 </div>
+
                 <div>
-                  <div className="text-xs text-amber-600">Expenses</div>
-                  <div className="text-lg sm:text-xl font-bold text-amber-700">
+                  <div
+                    className={`text-xs ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#D4C4A8]"
+                        : "text-amber-600"
+                    }`}
+                  >
+                    Expenses
+                  </div>
+                  <div
+                    className={`text-lg sm:text-xl font-bold ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#F8F4E1]"
+                        : "text-amber-700"
+                    }`}
+                  >
                     {filteredAndSortedExpenses.length}
                   </div>
                 </div>
+
                 <div>
-                  <div className="text-xs text-amber-600">Total</div>
-                  <div className="text-sm sm:text-lg font-bold text-amber-700 truncate">
+                  <div
+                    className={`text-xs ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#D4C4A8]"
+                        : "text-amber-600"
+                    }`}
+                  >
+                    Total
+                  </div>
+                  <div
+                    className={`text-sm sm:text-lg font-bold truncate ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#F8F4E1]"
+                        : "text-amber-700"
+                    }`}
+                  >
                     ₱{getTotalAmount().toFixed(2)}
                   </div>
                 </div>
+
                 <div>
-                  <div className="text-xs text-amber-600">Average</div>
-                  <div className="text-sm sm:text-lg font-bold text-amber-700 truncate">
+                  <div
+                    className={`text-xs ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#D4C4A8]"
+                        : "text-amber-600"
+                    }`}
+                  >
+                    Average
+                  </div>
+                  <div
+                    className={`text-sm sm:text-lg font-bold truncate ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#F8F4E1]"
+                        : "text-amber-700"
+                    }`}
+                  >
                     ₱
                     {(
                       getTotalAmount() / filteredAndSortedExpenses.length || 0
@@ -544,25 +711,54 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
           <div className="space-y-2 sm:space-y-3">
             {paginatedExpenses.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
-                <div className="bg-amber-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Minus className="w-6 h-6 sm:w-8 sm:h-8 text-amber-400" />
+                <div
+                  className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                    colors.background === "#1A1A1A"
+                      ? "bg-[#4A3426]"
+                      : "bg-amber-100"
+                  }`}
+                >
+                  <Minus
+                    className={`w-6 h-6 sm:w-8 sm:h-8 ${
+                      colors.background === "#1A1A1A"
+                        ? "text-[#D4C4A8]"
+                        : "text-amber-400"
+                    }`}
+                  />
                 </div>
-                <p className="text-amber-500 mb-2 text-sm sm:text-base">
+
+                <p
+                  className={`mb-2 text-sm sm:text-base ${
+                    colors.background === "#1A1A1A"
+                      ? "text-[#D4C4A8]"
+                      : "text-amber-500"
+                  }`}
+                >
                   {expenseArray.length === 0
                     ? "No expenses yet"
                     : "No expenses match your filters"}
                 </p>
+
                 {expenseArray.length > 0 && (
                   <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4">
                     <button
                       onClick={clearFilters}
-                      className="text-amber-600 hover:text-amber-800 text-sm font-medium"
+                      className={`text-sm font-medium transition-colors ${
+                        colors.background === "#1A1A1A"
+                          ? "text-[#AF8F6F] hover:text-[#F8F4E1]"
+                          : "text-amber-600 hover:text-amber-800"
+                      }`}
                     >
                       Clear filters to see all expenses
                     </button>
+
                     <button
                       onClick={handleBackToCategories}
-                      className="text-amber-600 hover:text-amber-800 text-sm font-medium"
+                      className={`text-sm font-medium transition-colors ${
+                        colors.background === "#1A1A1A"
+                          ? "text-[#AF8F6F] hover:text-[#F8F4E1]"
+                          : "text-amber-600 hover:text-amber-800"
+                      }`}
                     >
                       Back to categories
                     </button>
@@ -573,19 +769,47 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
               paginatedExpenses.map((expense) => (
                 <div
                   key={expense.id}
-                  className="bg-gradient-to-r from-amber-50 to-amber-50 hover:from-amber-100 hover:to-amber-100 rounded-lg transition-all duration-200 border border-amber-100 hover:border-amber-200 active:scale-95"
+                  className={`rounded-lg transition-all duration-200 active:scale-95 border ${
+                    colors.background === "#1A1A1A"
+                      ? "bg-[#2D2D2D] border-[#4A3426] hover:border-[#6B4C35]"
+                      : "bg-gradient-to-r from-amber-50 to-amber-50 hover:from-amber-100 hover:to-amber-100 border-amber-100 hover:border-amber-200"
+                  }`}
                 >
                   <div className="p-3 sm:p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                        <div className="bg-amber-200 p-1.5 sm:p-2 rounded-full flex-shrink-0">
-                          <Minus className="w-3 h-3 sm:w-4 sm:h-4 text-amber-700" />
+                        <div
+                          className={`p-1.5 sm:p-2 rounded-full flex-shrink-0 ${
+                            colors.background === "#1A1A1A"
+                              ? "bg-[#4A3426]"
+                              : "bg-amber-200"
+                          }`}
+                        >
+                          <Minus
+                            className={`w-3 h-3 sm:w-4 sm:h-4 ${
+                              colors.background === "#1A1A1A"
+                                ? "text-[#D4C4A8]"
+                                : "text-amber-700"
+                            }`}
+                          />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="font-medium text-amber-900 text-sm sm:text-base truncate">
+                          <h4
+                            className={`font-medium text-sm sm:text-base truncate ${
+                              colors.background === "#1A1A1A"
+                                ? "text-[#F8F4E1]"
+                                : "text-amber-900"
+                            }`}
+                          >
                             {expense.name}
                           </h4>
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm text-amber-600">
+                          <div
+                            className={`flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm ${
+                              colors.background === "#1A1A1A"
+                                ? "text-[#D4C4A8]"
+                                : "text-amber-600"
+                            }`}
+                          >
                             <span className="truncate">
                               {budgets[expense.budgetId]?.name ||
                                 "Unknown Budget"}
@@ -597,25 +821,42 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                           </div>
                         </div>
                       </div>
+
                       <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
                         <div className="flex flex-col items-center space-y-0.5 sm:space-y-1">
-                          <span className="font-semibold text-amber-700 text-sm sm:text-base whitespace-nowrap">
+                          <span
+                            className={`font-semibold text-sm sm:text-base whitespace-nowrap ${
+                              colors.background === "#1A1A1A"
+                                ? "text-[#F8F4E1]"
+                                : "text-amber-700"
+                            }`}
+                          >
                             -₱{expense.amount.toFixed(2)}
                           </span>
+
                           {expense.imageUrl && (
                             <button
                               onClick={() =>
                                 window.open(expense.imageUrl, "_blank")
                               }
-                              className="text-xs text-amber-600 underline hover:text-amber-800"
+                              className={`text-xs underline transition-colors ${
+                                colors.background === "#1A1A1A"
+                                  ? "text-[#AF8F6F] hover:text-[#F8F4E1]"
+                                  : "text-amber-600 hover:text-amber-800"
+                              }`}
                             >
                               View Receipt
                             </button>
                           )}
                         </div>
+
                         <button
                           onClick={() => onDelete(expense.id)}
-                          className="p-1.5 sm:p-2 text-amber-400 hover:text-amber-600 hover:bg-amber-50 rounded-full transition-colors active:scale-90"
+                          className={`p-1.5 sm:p-2 rounded-full transition-colors active:scale-90 ${
+                            colors.background === "#1A1A1A"
+                              ? "text-[#AF8F6F] hover:text-[#F8F4E1] hover:bg-[#4A3426]"
+                              : "text-amber-400 hover:text-amber-600 hover:bg-amber-50"
+                          }`}
                         >
                           <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
@@ -628,22 +869,42 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
 
             {/* Pagination - Mobile optimized */}
             {totalPages > 1 && (
-              <div className="flex flex-col items-center justify-center mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-amber-200 space-y-3">
-                <div className="text-xs sm:text-sm text-amber-600 text-center">
+              <div
+                className={`flex flex-col items-center justify-center mt-4 sm:mt-6 pt-4 sm:pt-6 space-y-3 border-t ${
+                  colors.background === "#1A1A1A"
+                    ? "border-[#4A3426]"
+                    : "border-amber-200"
+                }`}
+              >
+                <div
+                  className={`text-xs sm:text-sm text-center ${
+                    colors.background === "#1A1A1A"
+                      ? "text-[#D4C4A8]"
+                      : "text-amber-600"
+                  }`}
+                >
                   Showing {startIndex + 1} to{" "}
                   {Math.min(startIndex + itemsPerPage, displayExpenses.length)}{" "}
                   of {displayExpenses.length} expenses
                 </div>
+
                 <div className="flex items-center space-x-1 sm:space-x-2">
+                  {/* Prev Button */}
                   <button
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
                     disabled={currentPage === 1}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm border border-amber-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-50 transition-colors"
+                    className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
+                      colors.background === "#1A1A1A"
+                        ? "border border-[#6B4C35] hover:bg-[#2D1810]"
+                        : "border border-amber-200 hover:bg-amber-50"
+                    }`}
                   >
                     Prev
                   </button>
+
+                  {/* Page Numbers */}
                   <div className="flex space-x-1">
                     {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => {
                       let page;
@@ -656,13 +917,20 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                       } else {
                         page = currentPage - 1 + i;
                       }
+
+                      const isActive = currentPage === page;
+
                       return (
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${
-                            currentPage === page
-                              ? "bg-amber-300 text-amber-900"
+                          className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors cursor-pointer ${
+                            isActive
+                              ? colors.background === "#1A1A1A"
+                                ? "bg-[#6B4C35] text-[#F8F4E1]"
+                                : "bg-amber-300 text-amber-900"
+                              : colors.background === "#1A1A1A"
+                              ? "border border-[#4A3426] hover:bg-[#2D2D2D]"
                               : "border border-amber-200 hover:bg-amber-50"
                           }`}
                         >
@@ -671,12 +939,18 @@ const ExpenseList = ({ expenses, budgets, onDelete }) => {
                       );
                     })}
                   </div>
+
+                  {/* Next Button */}
                   <button
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm border border-amber-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-50 transition-colors"
+                    className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
+                      colors.background === "#1A1A1A"
+                        ? "border border-[#6B4C35] hover:bg-[#2D1810]"
+                        : "border border-amber-200 hover:bg-amber-50"
+                    }`}
                   >
                     Next
                   </button>

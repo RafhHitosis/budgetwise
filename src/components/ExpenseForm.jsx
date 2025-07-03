@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
+const ExpenseForm = ({ budgets, onSubmit, onCancel, colors }) => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [budgetId, setBudgetId] = useState("");
@@ -61,16 +61,22 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
     setUploading(false);
   };
 
+  React.useEffect(() => {
+    if (Object.keys(budgets).length === 1) {
+      const onlyId = Object.keys(budgets)[0];
+      setBudgetId(onlyId);
+    }
+  }, [budgets]);
+
   return (
-    <div className="bg-[#F3E5D8] rounded-xl shadow-lg p-6">
-      <h3 className="text-lg font-semibold text-[#543310] mb-4">
-        Add New Expense
-      </h3>
+    <div
+      style={{ backgroundColor: colors.cardBg, color: colors.text }}
+      className="bg-[#F3E5D8] rounded-xl shadow-lg p-6"
+    >
+      <h3 className="text-lg font-semibold mb-4">Add New Expense</h3>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[#543310] mb-2">
-            Expense Name
-          </label>
+          <label className="block text-sm font-medium mb-2">Expense Name</label>
           <input
             type="text"
             value={name}
@@ -82,9 +88,7 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#543310] mb-2">
-            Amount
-          </label>
+          <label className="block text-sm font-medium mb-2">Amount</label>
           <input
             type="number"
             step="0.01"
@@ -97,39 +101,47 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#543310] mb-2">
+          <label className="block text-sm font-medium mb-2">
             Budget Category
           </label>
           <div className="relative">
             <select
               value={budgetId}
+              style={{ color: colors.text }}
               onChange={(e) => setBudgetId(e.target.value)}
               className="w-full px-4 py-3 border border-[#B8906B] rounded-lg appearance-none bg-transparent text-[#543310] focus:outline-none focus:ring-2 focus:ring-[#B8906B] pr-10"
               required
             >
-              <option value="">Select a budget</option>
+              {Object.keys(budgets).length > 1 && (
+                <option style={{ color: "#543310" }} value="">
+                  Select a budget
+                </option>
+              )}
               {Object.entries(budgets).map(([id, budget]) => (
-                <option key={id} value={id}>
+                <option style={{ color: "#543310" }} key={id} value={id}>
                   {budget.name} (${(budget.amount - budget.spent).toFixed(2)}{" "}
                   remaining)
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#543310]">
+            <div
+              style={{ color: colors.text }}
+              className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#543310]"
+            >
               ▼
             </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#543310] mb-2">
+          <label className="block text-sm font-medium mb-2">
             Upload Receipt (optional)
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files[0])}
-            className="block w-full text-sm text-[#543310] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#B8906B] file:text-white hover:file:bg-[#a97c59]"
+            className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#B8906B] file:text-white hover:file:bg-[#a97c59] cursor-pointer"
           />
         </div>
 
@@ -137,13 +149,14 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel }) => {
           <button
             onClick={handleSubmit}
             disabled={uploading}
-            className="flex-1 bg-[#B8906B] text-white py-3 px-4 rounded-lg hover:bg-[#a97c59]"
+            className="flex-1 bg-[#74512D] text-white py-3 px-4 rounded-lg hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
           >
             {uploading ? "Uploading..." : "Add Expense"}
+            {""}
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg hover:bg-[#d4c3b0]"
+            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
           >
             Cancel
           </button>

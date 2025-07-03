@@ -4,6 +4,7 @@ import AuthForm from "./components/AuthForm";
 import Dashboard from "./components/Dashboard";
 import { auth } from "./firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import "./index.css";
 
 const App = () => {
@@ -32,13 +33,15 @@ const App = () => {
   }
 
   return (
-    <div className="font-sans">
-      {user ? (
-        <Dashboard user={user} onLogout={handleLogout} />
-      ) : (
-        <AuthForm onLogin={setUser} />
-      )}
-    </div>
+    <ThemeProvider>
+      <div className="font-sans">
+        {user ? (
+          <Dashboard user={user} onLogout={handleLogout} />
+        ) : (
+          <AuthForm onLogin={setUser} />
+        )}
+      </div>
+    </ThemeProvider>
   );
 };
 

@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   Download,
   FileText,
@@ -10,7 +12,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 
-const ExportReport = ({ budgets, expenses, onClose, user }) => {
+const ExportReport = ({ budgets, expenses, onClose, user, colors }) => {
   const [exportFormat, setExportFormat] = useState("pdf");
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [selectedBudgets, setSelectedBudgets] = useState({});
@@ -667,12 +669,28 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
   };
 
   const selectedCount = Object.values(selectedBudgets).filter(Boolean).length;
+  const startDateObj = dateRange.startDate
+    ? new Date(dateRange.startDate)
+    : null;
+  const endDateObj = dateRange.endDate ? new Date(dateRange.endDate) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
+      style={{ backgroundColor: colors.overlay }}
+    >
+      <div
+        className="rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden"
+        style={{ backgroundColor: colors.cardBg }}
+      >
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-600 to-amber-600 text-amber-100 p-3 sm:p-4">
+        <div
+          className="p-3 sm:p-4"
+          style={{
+            background: `linear-gradient(to right, ${colors.accent}, ${colors.accent})`,
+            color: colors.textOnAccent,
+          }}
+        >
           <div className="flex justify-between items-center">
             <h2 className="text-base sm:text-lg font-bold flex items-center">
               <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -681,6 +699,9 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
             <button
               onClick={onClose}
               className="p-1 hover:bg-white hover:bg-opacity-20 hover:text-amber-900 rounded"
+              style={{
+                color: colors.textOnAccent,
+              }}
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
@@ -693,8 +714,12 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
             <div className="space-y-4 sm:space-y-6">
               {/* Basic Settings */}
               <div className="space-y-3 sm:space-y-4">
+                {/* Report Name */}
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-amber-900">
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.text }}
+                  >
                     Report Name
                   </label>
                   <input
@@ -702,11 +727,20 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
                     value={reportName}
                     onChange={(e) => setReportName(e.target.value)}
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-amber-300 text-sm sm:text-base"
+                    style={{
+                      backgroundColor: colors.inputBg,
+                      color: colors.text,
+                      borderColor: colors.border,
+                    }}
                   />
                 </div>
 
+                {/* Export Format */}
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-amber-900">
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.text }}
+                  >
                     Format
                   </label>
                   <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -724,38 +758,70 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
                         onClick={() => setExportFormat(value)}
                         className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                           exportFormat === value
-                            ? "border-amber-700 bg-amber-50 shadow-md transform scale-105"
-                            : "border-amber-500 hover:border-amber-400 hover:shadow-sm"
+                            ? "bg-amber-50 shadow-md transform scale-105"
+                            : "hover:shadow-sm"
                         }`}
+                        style={{
+                          borderColor:
+                            exportFormat === value
+                              ? colors.accent
+                              : colors.border,
+                          backgroundColor:
+                            exportFormat === value
+                              ? colors.cardHighlight
+                              : colors.cardBg,
+                        }}
                       >
                         <Icon
-                          className={`w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1 ${
-                            exportFormat === value
-                              ? "text-amber-600"
-                              : "text-amber-800"
-                          }`}
+                          className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1"
+                          style={{
+                            color:
+                              exportFormat === value
+                                ? colors.accent
+                                : colors.iconSecondary,
+                          }}
                         />
                         <div
-                          className={`text-xs sm:text-sm ${
-                            exportFormat === value
-                              ? "text-amber-600 font-medium"
-                              : "text-amber-800"
-                          }`}
+                          className="text-xs sm:text-sm"
+                          style={{
+                            color:
+                              exportFormat === value
+                                ? colors.accent
+                                : colors.textSecondary,
+                            fontWeight:
+                              exportFormat === value ? "500" : "normal",
+                          }}
                         >
                           {label}
                         </div>
                       </button>
                     ))}
                   </div>
+
+                  {/* Export format info */}
                   {exportFormat === "pdf" && (
-                    <div className="mt-2 p-2 bg-amber-50 text-amber-700 text-xs rounded border border-amber-200">
+                    <div
+                      className="mt-2 p-2 text-xs rounded border"
+                      style={{
+                        backgroundColor: colors.infoBg,
+                        color: colors.text,
+                        borderColor: colors.border,
+                      }}
+                    >
                       📄 Exported in PDF format with clean layout and
                       formatting.
                     </div>
                   )}
 
                   {exportFormat === "csv" && (
-                    <div className="mt-2 p-2 bg-amber-50 text-amber-700 text-xs rounded border border-amber-200">
+                    <div
+                      className="mt-2 p-2 text-xs rounded border"
+                      style={{
+                        backgroundColor: colors.infoBg,
+                        color: colors.text,
+                        borderColor: colors.border,
+                      }}
+                    >
                       📊 Exported in CSV format, suitable for spreadsheets and
                       data analysis.
                     </div>
@@ -764,47 +830,75 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
               </div>
 
               {/* Date Range */}
-              <div className="border-t pt-3 sm:pt-4">
-                <h3 className="font-medium mb-3 flex items-center text-sm sm:text-base">
+              <div
+                className="border-t pt-3 sm:pt-4"
+                style={{ borderTopColor: colors.border }}
+              >
+                <h3
+                  className="font-medium mb-3 flex items-center text-sm sm:text-base"
+                  style={{ color: colors.text }}
+                >
                   <Calendar className="w-4 h-4 mr-2" />
                   Date Range
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                  <input
-                    type="date"
-                    value={dateRange.startDate}
-                    onChange={(e) =>
-                      setDateRange((prev) => ({
-                        ...prev,
-                        startDate: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 border rounded-lg text-sm text-amber-900 bg-amber-50 appearance-none min-h-[44px] focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
-                    style={{
-                      WebkitAppearance: "none",
-                      MozAppearance: "textfield",
-                    }}
-                  />
-                  <input
-                    type="date"
-                    value={dateRange.endDate}
-                    onChange={(e) =>
-                      setDateRange((prev) => ({
-                        ...prev,
-                        endDate: e.target.value,
-                      }))
-                    }
-                    className="w-full p-3 border rounded-lg text-sm text-amber-900 bg-amber-50 appearance-none min-h-[44px] focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
-                    style={{
-                      WebkitAppearance: "none",
-                      MozAppearance: "textfield",
-                    }}
-                  />
+
+                {/* Wrapper to prevent layout shift */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 relative z-0">
+                  <div className="relative">
+                    <DatePicker
+                      selected={startDateObj}
+                      onChange={(date) =>
+                        setDateRange((prev) => ({
+                          ...prev,
+                          startDate: date
+                            ? date.toISOString().split("T")[0]
+                            : "",
+                        }))
+                      }
+                      dateFormat="yyyy-MM-dd"
+                      placeholderText="Start Date"
+                      className="w-full p-3 rounded-lg text-sm min-h-[44px] appearance-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300 border border-amber-800"
+                      style={{
+                        backgroundColor: colors.surface,
+                        color: colors.text,
+                      }}
+                      // Simplified configuration - remove problematic popper settings
+                      shouldCloseOnSelect={true}
+                      showPopperArrow={false}
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <DatePicker
+                      selected={endDateObj}
+                      onChange={(date) =>
+                        setDateRange((prev) => ({
+                          ...prev,
+                          endDate: date ? date.toISOString().split("T")[0] : "",
+                        }))
+                      }
+                      dateFormat="yyyy-MM-dd"
+                      placeholderText="End Date"
+                      className="w-full p-3 rounded-lg text-sm min-h-[44px] appearance-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300 border border-amber-800"
+                      style={{
+                        backgroundColor: colors.surface,
+                        color: colors.text,
+                        border: `1px solid ${colors.border}`,
+                      }}
+                      // Simplified configuration - remove problematic popper settings
+                      shouldCloseOnSelect={true}
+                      showPopperArrow={false}
+                    />
+                  </div>
                 </div>
+
                 {(dateRange.startDate || dateRange.endDate) && (
                   <button
                     onClick={() => setDateRange({ startDate: "", endDate: "" })}
-                    className="text-sm text-amber-600 hover:text-amber-800 mt-2 transition-colors"
+                    className="text-sm mt-2 transition-colors cursor-pointer hover:opacity-80"
+                    style={{
+                      color: colors.textSecondary,
+                    }}
                   >
                     Clear dates
                   </button>
@@ -812,7 +906,10 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
               </div>
 
               {/* Budget Selection */}
-              <div className="border-t pt-3 sm:pt-4">
+              <div
+                style={{ borderTopColor: colors.border }}
+                className="border-t pt-3 sm:pt-4"
+              >
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-medium flex items-center text-sm sm:text-base">
                     <Filter className="w-4 h-4 mr-2" />
@@ -832,7 +929,7 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
                     <div
                       key={id}
                       onClick={() => handleBudgetToggle(id)}
-                      className="flex items-center p-2 hover:bg-amber-50 rounded cursor-pointer transition-colors"
+                      className="flex items-center p-2 rounded cursor-pointer transition-colors border border-transparent hover:border-amber-600"
                     >
                       {selectedBudgets[id] ? (
                         <CheckSquare className="w-4 h-4 mr-2 text-amber-600 flex-shrink-0" />
@@ -891,7 +988,7 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
                           [key]: !prev[key],
                         }))
                       }
-                      className="flex items-start p-2 sm:p-3 hover:bg-amber-50 rounded cursor-pointer transition-colors border border-transparent hover:border-gray-200"
+                      className="flex items-start p-2 sm:p-3 rounded cursor-pointer transition-colors border border-transparent hover:border-amber-600"
                     >
                       {includeOptions[key] ? (
                         <CheckSquare className="w-4 h-4 mr-2 sm:mr-3 text-amber-600 mt-0.5 flex-shrink-0" />
@@ -908,47 +1005,63 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
               </div>
 
               {/* Preview Stats */}
-              <div className="bg-gradient-to-br from-amber-50 to-amber-50 p-3 sm:p-4 rounded-lg border border-amber-100">
-                <h3 className="font-medium mb-3 text-amber-900 text-sm sm:text-base">
+              <div
+                className="p-3 sm:p-4 rounded-lg border"
+                style={{
+                  background: `linear-gradient(to bottom right, ${colors.cardBg}, ${colors.cardBg})`,
+                  borderColor: colors.border,
+                }}
+              >
+                <h3
+                  className="font-medium mb-3 text-sm sm:text-base"
+                  style={{ color: colors.text }}
+                >
                   Report Preview
                 </h3>
+
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center">
-                  <div className="bg-amber-50 p-2 sm:p-3 rounded-lg shadow-sm">
-                    <div className="text-lg sm:text-2xl font-bold text-amber-600">
-                      {selectedCount}
+                  {[
+                    { label: "Budgets", value: selectedCount },
+                    { label: "Expenses", value: stats.expenseCount },
+                    {
+                      label: "Budget",
+                      value: `₱${stats.totalBudget.toFixed(0)}`,
+                    },
+                    {
+                      label: "Spent",
+                      value: `₱${stats.totalSpent.toFixed(0)}`,
+                    },
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="p-2 sm:p-3 rounded-lg shadow-sm"
+                      style={{ backgroundColor: colors.cardHover }}
+                    >
+                      <div
+                        className="text-lg sm:text-2xl font-bold"
+                        style={{ color: colors.text }}
+                      >
+                        {item.value}
+                      </div>
+                      <div
+                        className="text-xs sm:text-sm text-amber-400"
+                        style={{ color: colors.text }}
+                      >
+                        {item.label}
+                      </div>
                     </div>
-                    <div className="text-xs sm:text-sm text-amber-900">
-                      Budgets
-                    </div>
-                  </div>
-                  <div className="bg-amber-50 p-2 sm:p-3 rounded-lg shadow-sm">
-                    <div className="text-lg sm:text-2xl font-bold text-amber-600">
-                      {stats.expenseCount}
-                    </div>
-                    <div className="text-xs sm:text-sm text-amber-900">
-                      Expenses
-                    </div>
-                  </div>
-                  <div className="bg-amber-50 p-2 sm:p-3 rounded-lg shadow-sm">
-                    <div className="text-lg sm:text-2xl font-bold text-amber-600">
-                      ₱{stats.totalBudget.toFixed(0)}
-                    </div>
-                    <div className="text-xs sm:text-sm text-amber-900">
-                      Budget
-                    </div>
-                  </div>
-                  <div className="bg-amber-50 p-2 sm:p-3 rounded-lg shadow-sm">
-                    <div className="text-lg sm:text-2xl font-bold text-amber-600">
-                      ₱{stats.totalSpent.toFixed(0)}
-                    </div>
-                    <div className="text-xs sm:text-sm text-amber-900">
-                      Spent
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 {selectedCount === 0 && (
-                  <div className="mt-3 p-2 sm:p-3 bg-amber-100 text-amber-800 text-xs sm:text-sm rounded border border-amber-200">
+                  <div
+                    className="mt-3 p-2 sm:p-3 text-xs sm:text-sm rounded border"
+                    style={{
+                      backgroundColor: colors.surface,
+                      color: colors.textSecondary,
+                      borderColor: colors.border,
+                    }}
+                  >
                     ⚠️ Please select at least one budget to generate the report
                   </div>
                 )}
@@ -958,26 +1071,52 @@ const ExportReport = ({ budgets, expenses, onClose, user }) => {
         </div>
 
         {/* Footer */}
-        <div className="bg-amber-50 p-3 sm:p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
-          <div className="text-xs sm:text-sm text-amber-600 text-center sm:text-left">
-            {stats.expenseCount} expenses from {selectedCount} budgets
-            {exportFormat === "pdf"}
+        <div
+          className="p-3 sm:p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-3"
+          style={{
+            backgroundColor: colors.cardBg,
+            borderTopColor: colors.border,
+          }}
+        >
+          <div
+            className="text-xs sm:text-sm text-center sm:text-left"
+            style={{ color: colors.textSecondary }}
+          >
+            {stats.expenseCount} expenses from {selectedCount} budgets (
+            {exportFormat.toUpperCase()})
           </div>
+
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border border-amber-300 rounded-lg hover:bg-amber-50 transition-colors text-sm"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-sm transition-colors"
+              style={{
+                backgroundColor: "transparent",
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+              }}
             >
               Cancel
             </button>
+
             <button
               onClick={handleExport}
               disabled={selectedCount === 0 || isExporting}
-              className="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-800 text-amber-100 rounded-lg hover:from-amber-700 hover:to-amber-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200 transform hover:scale-105 active:scale-95 text-sm"
+              className="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm flex items-center justify-center transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: `linear-gradient(to right, ${colors.buttonPrimary}, ${colors.buttonSecondary})`,
+                color: colors.text,
+              }}
             >
               {isExporting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-amber-100 border-t-transparent rounded-full animate-spin mr-2" />
+                  <div
+                    className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin mr-2"
+                    style={{
+                      borderColor: colors.text,
+                      borderTopColor: "transparent",
+                    }}
+                  />
                   Generating...
                 </>
               ) : (

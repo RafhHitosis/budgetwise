@@ -1,7 +1,7 @@
 import React from "react";
 import { Edit2, Trash2, Target, Calendar, TrendingUp } from "lucide-react";
 
-const GoalCard = ({ goal, onEdit, onDelete }) => {
+const GoalCard = ({ goal, onEdit, onDelete, colors }) => {
   const progressPercentage = Math.min((goal.saved / goal.amount) * 100, 100);
   const remainingAmount = Math.max(goal.amount - goal.saved, 0);
 
@@ -29,12 +29,19 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
   const isCompleted = goal.saved >= goal.amount;
 
   return (
-    <div className="p-6 border-2 rounded-2xl relative overflow-hidden">
-      {/* Progress Background */}
+    <div
+      className="p-6 border-2 rounded-2xl relative overflow-hidden"
+      style={{
+        borderColor: colors.border,
+        backgroundColor: colors.cardBg || colors.surface,
+        color: colors.text,
+      }}
+    >
+      {/* Progress Background Overlay */}
       <div
         className="absolute inset-0 opacity-10"
         style={{
-          background: `linear-gradient(to right, #74512D ${progressPercentage}%, transparent ${progressPercentage}%)`,
+          background: `linear-gradient(to right, ${colors.accent} ${progressPercentage}%, transparent ${progressPercentage}%)`,
         }}
       />
 
@@ -44,52 +51,53 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: "#74512D" }}
+              style={{ backgroundColor: colors.secondary }}
             >
-              <Target className="w-5 h-5" style={{ color: "#F8F4E1" }} />
+              <Target className="w-5 h-5" style={{ color: "white" }} />
             </div>
             <div className="min-w-0 flex-1">
-              <h3
-                className="font-bold text-lg truncate"
-                style={{ color: "#543310" }}
-              >
-                {goal.name}
-              </h3>
-              <p className="text-sm opacity-70" style={{ color: "#74512D" }}>
+              <h3 className="font-bold text-lg truncate">{goal.name}</h3>
+              <p className="text-sm" style={{ opacity: 0.8 }}>
                 {isCompleted
                   ? "Goal Achieved!"
                   : isOverdue
                   ? "Overdue"
-                  : `${daysRemaining} days left`}
+                  : `${daysRemaining} day${
+                      daysRemaining !== 1 ? "s" : ""
+                    } left`}
               </p>
             </div>
           </div>
 
+          {/* Action Buttons */}
           <div className="flex space-x-2 flex-shrink-0">
             <button
               onClick={onEdit}
-              className="p-2 rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-300"
-              style={{ backgroundColor: "#AF8F6F", color: "#F8F4E1" }}
+              className="p-2 rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
+              style={{ backgroundColor: colors.accent, color: colors.text }}
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={onDelete}
-              className="p-2 rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-300"
-              style={{ backgroundColor: "#B8906B", color: "#543310" }}
+              className="p-2 rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
+              style={{
+                backgroundColor: colors.buttonSecondary,
+                color: colors.text,
+              }}
             >
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Goal Amount and Progress */}
+        {/* Amount & Progress */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium" style={{ color: "#74512D" }}>
+            <span className="text-sm font-medium">
               Target: ₱{goal.amount.toFixed(2)}
             </span>
-            <span className="text-sm font-medium" style={{ color: "#74512D" }}>
+            <span className="text-sm font-medium">
               {progressPercentage.toFixed(1)}%
             </span>
           </div>
@@ -103,16 +111,14 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
               className="h-full rounded-full transition-all duration-500 ease-out"
               style={{
                 width: `${progressPercentage}%`,
-                backgroundColor: isCompleted ? "#4CAF50" : "#74512D",
+                backgroundColor: isCompleted ? "#4CAF50" : colors.primary,
               }}
             />
           </div>
 
           <div className="flex justify-between items-center mt-2">
-            <span className="text-sm" style={{ color: "#543310" }}>
-              Saved: ₱{goal.saved.toFixed(2)}
-            </span>
-            <span className="text-sm" style={{ color: "#543310" }}>
+            <span className="text-sm">Saved: ₱{goal.saved.toFixed(2)}</span>
+            <span className="text-sm">
               Remaining: ₱{remainingAmount.toFixed(2)}
             </span>
           </div>
@@ -121,12 +127,13 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
         {/* Timeline */}
         <div className="mb-4">
           <div className="flex items-center space-x-2 mb-2">
-            <Calendar className="w-4 h-4" style={{ color: "#74512D" }} />
-            <span className="text-sm font-medium" style={{ color: "#74512D" }}>
-              Timeline
-            </span>
+            <Calendar
+              className="w-4 h-4"
+              style={{ color: colors.textSecondary }}
+            />
+            <span className="text-sm font-medium">Timeline</span>
           </div>
-          <p className="text-sm" style={{ color: "#543310" }}>
+          <p className="text-sm">
             {formatDate(goal.startDate)} → {formatDate(goal.targetDate)}
           </p>
         </div>
@@ -135,22 +142,25 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
         {!isCompleted && (
           <div
             className="p-4 rounded-xl"
-            style={{ backgroundColor: "#F8F4E1", border: "1px solid #AF8F6F" }}
+            style={{
+              backgroundColor: colors.surface,
+              border: `1px solid ${colors.border}`,
+            }}
           >
             <div className="flex items-center space-x-2 mb-2">
-              <TrendingUp className="w-4 h-4" style={{ color: "#74512D" }} />
-              <span
-                className="text-sm font-medium"
-                style={{ color: "#74512D" }}
-              >
+              <TrendingUp
+                className="w-4 h-4"
+                style={{ color: colors.textSecondary }}
+              />
+              <span className="text-sm font-medium">
                 Suggested Kinsenas Contribution
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-lg font-bold" style={{ color: "#543310" }}>
+              <span className="text-lg font-bold">
                 ₱{suggestedContribution.toFixed(2)}
               </span>
-              <span className="text-xs" style={{ color: "#74512D" }}>
+              <span className="text-xs">
                 for next {kinsenasRemaining} kinsenas
               </span>
             </div>
