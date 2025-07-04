@@ -111,7 +111,7 @@ const GoalCard = ({ goal, onEdit, onDelete, colors }) => {
               className="h-full rounded-full transition-all duration-500 ease-out"
               style={{
                 width: `${progressPercentage}%`,
-                backgroundColor: isCompleted ? "#4CAF50" : colors.primary,
+                backgroundColor: isCompleted ? "#4CAF50" : "#A7794F",
               }}
             />
           </div>

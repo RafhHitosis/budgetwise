@@ -1,6 +1,6 @@
 // App.js
 import React, { useState, useEffect } from "react";
-import AuthForm from "./components/AuthForm";
+import AuthForm from "./components/auth/AuthForm";
 import Dashboard from "./components/Dashboard";
 import { auth } from "./firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";

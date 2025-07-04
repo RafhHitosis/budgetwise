@@ -1,7 +1,7 @@
 // components/AIAssistantModal.js
 import React, { useState } from "react";
 import { X, Bot, Loader, Lightbulb, TrendingUp, Tag } from "lucide-react";
-import geminiService from "../services/geminiService";
+import geminiService from "../../services/geminiService";
 
 const AIAssistantModal = ({
   isOpen,
