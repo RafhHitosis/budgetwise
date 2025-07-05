@@ -154,6 +154,37 @@ const Dashboard = ({ user, onLogout }) => {
 
   // Firebase data subscriptions
   useEffect(() => {
+    setBudgetsLoading(true);
+
+    const budgetsRef = ref(database, "budgets");
+    const unsubscribe = onValue(budgetsRef, (snapshot) => {
+      const allBudgets = snapshot.val() || {};
+      const visibleBudgets = {};
+
+      // Loop through all users’ budgets
+      Object.entries(allBudgets).forEach(([ownerId, userBudgets]) => {
+        Object.entries(userBudgets).forEach(([budgetId, budget]) => {
+          const isOwner = budget.owner === user.uid;
+          const isCollaborator =
+            budget.collaborators && budget.collaborators[user.uid];
+
+          if (isOwner || isCollaborator) {
+            visibleBudgets[budgetId] = {
+              ...budget,
+              owner: ownerId,
+            };
+          }
+        });
+      });
+
+      setBudgets(visibleBudgets);
+      setBudgetsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user.uid]);
+
+  useEffect(() => {
     const createSubscription = (path, setter, loadingSetter) => {
       loadingSetter(true);
       return onValue(ref(database, `${path}/${user.uid}`), (snapshot) => {
@@ -163,7 +194,6 @@ const Dashboard = ({ user, onLogout }) => {
     };
 
     const unsubscribes = [
-      createSubscription("budgets", setBudgets, setBudgetsLoading),
       createSubscription("expenses", setExpenses, setExpensesLoading),
       createSubscription("goals", setGoals, setGoalsLoading),
     ];
@@ -187,7 +217,12 @@ const Dashboard = ({ user, onLogout }) => {
 
   const handleAddBudget = async (budgetData) => {
     const newRef = push(ref(database, `budgets/${user.uid}`));
-    await set(newRef, { ...budgetData, id: newRef.key });
+    await set(newRef, {
+      ...budgetData,
+      id: newRef.key,
+      owner: user.uid,
+      collaborators: {}, // Start empty
+    });
     setShowBudgetForm(false);
     setShowFABMenu(false);
   };
@@ -211,19 +246,53 @@ const Dashboard = ({ user, onLogout }) => {
 
   const handleAddExpense = async (expenseData) => {
     const newRef = push(ref(database, `expenses/${user.uid}`));
-    await set(newRef, { ...expenseData, id: newRef.key });
 
-    const budgetRef = ref(
-      database,
-      `budgets/${user.uid}/${expenseData.budgetId}`
+    await set(newRef, {
+      ...expenseData,
+      id: newRef.key,
+      createdBy: {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email.split("@")[0], // Add display name
+      },
+    });
+
+    const targetBudget = Object.values(budgets).find(
+      (b) => b.id === expenseData.budgetId
     );
-    const snapshot = await get(budgetRef);
-    const currentBudget = snapshot.val();
-    if (currentBudget) {
-      await set(budgetRef, {
-        ...currentBudget,
-        spent: currentBudget.spent + expenseData.amount,
-      });
+
+    if (targetBudget) {
+      const budgetRef = ref(
+        database,
+        `budgets/${targetBudget.owner}/${expenseData.budgetId}`
+      );
+
+      const snapshot = await get(budgetRef);
+      const currentBudget = snapshot.val();
+
+      if (currentBudget) {
+        await set(budgetRef, {
+          ...currentBudget,
+          spent: currentBudget.spent + expenseData.amount,
+        });
+
+        // NEW: If this is a collaborative budget, also add expense to budget owner's expenses
+        if (targetBudget.owner !== user.uid) {
+          const ownerExpenseRef = push(
+            ref(database, `expenses/${targetBudget.owner}`)
+          );
+          await set(ownerExpenseRef, {
+            ...expenseData,
+            id: ownerExpenseRef.key,
+            createdBy: {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName || user.email.split("@")[0],
+            },
+            isCollaboratorExpense: true, // Flag to identify collaborator expenses
+          });
+        }
+      }
     }
 
     setShowExpenseForm(false);
@@ -234,21 +303,56 @@ const Dashboard = ({ user, onLogout }) => {
     const expense = expenses[expenseId];
     if (!expense) return;
 
+    const budget = Object.values(budgets).find(
+      (b) => b.id === expense.budgetId
+    );
+    const budgetOwner = budget?.owner;
+
     openConfirmModal(
       async () => {
-        const budgetRef = ref(
-          database,
-          `budgets/${user.uid}/${expense.budgetId}`
-        );
-        const snapshot = await get(budgetRef);
-        const currentBudget = snapshot.val();
-        if (currentBudget) {
-          await set(budgetRef, {
-            ...currentBudget,
-            spent: currentBudget.spent - expense.amount,
-          });
+        if (budget && budgetOwner) {
+          const budgetRef = ref(
+            database,
+            `budgets/${budgetOwner}/${expense.budgetId}`
+          );
+          const snapshot = await get(budgetRef);
+          const currentBudget = snapshot.val();
+          if (currentBudget) {
+            await set(budgetRef, {
+              ...currentBudget,
+              spent: currentBudget.spent - expense.amount,
+            });
+          }
         }
+
+        // Delete from current user's expenses
         await remove(ref(database, `expenses/${user.uid}/${expenseId}`));
+
+        // NEW: If this is a collaborator expense, also delete from budget owner's expenses
+        // NEW: If this expense was created by a collaborator, also delete from budget owner's expenses
+        if (budgetOwner && budgetOwner !== user.uid) {
+          // Find and delete the corresponding expense in owner's list
+          const ownerExpensesRef = ref(database, `expenses/${budgetOwner}`);
+          const ownerSnapshot = await get(ownerExpensesRef);
+          const ownerExpenses = ownerSnapshot.val() || {};
+
+          // Find matching expense by budgetId, amount, date, and createdBy
+          const matchingExpenseId = Object.keys(ownerExpenses).find((id) => {
+            const ownerExpense = ownerExpenses[id];
+            return (
+              ownerExpense.budgetId === expense.budgetId &&
+              ownerExpense.amount === expense.amount &&
+              ownerExpense.date === expense.date &&
+              ownerExpense.createdBy?.uid === expense.createdBy?.uid
+            );
+          });
+
+          if (matchingExpenseId) {
+            await remove(
+              ref(database, `expenses/${budgetOwner}/${matchingExpenseId}`)
+            );
+          }
+        }
       },
       "Delete Expense",
       "This action cannot be undone."
@@ -360,6 +464,7 @@ const Dashboard = ({ user, onLogout }) => {
           ) : (
             <>
               <BudgetList
+                user={user}
                 colors={colors}
                 budgets={budgets}
                 filteredBudgets={filteredBudgets}
@@ -382,6 +487,7 @@ const Dashboard = ({ user, onLogout }) => {
                   <ExpensesSkeleton />
                 ) : (
                   <ExpenseList
+                    user={user}
                     colors={colors}
                     expenses={expenses}
                     budgets={budgets}

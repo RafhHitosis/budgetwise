@@ -1,8 +1,16 @@
 // components/BudgetCard.js
 import React, { useEffect, useState } from "react";
 import { Edit3, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import CollaboratorManager from "../collab/CollaboratorManager ";
 
-const BudgetCard = ({ budget, onEdit, onDelete, onExpenseDeduct, colors }) => {
+const BudgetCard = ({
+  budget,
+  onEdit,
+  onDelete,
+  onExpenseDeduct,
+  colors,
+  user,
+}) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const percentage = (budget.spent / budget.amount) * 100;
@@ -232,6 +240,10 @@ const BudgetCard = ({ budget, onEdit, onDelete, onExpenseDeduct, colors }) => {
             </span>
           </div>
         </div>
+      </div>
+
+      <div className="w-full sm:w-[90%] mx-auto">
+        <CollaboratorManager user={user} budget={budget} colors={colors} />
       </div>
     </div>
   );

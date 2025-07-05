@@ -3,6 +3,7 @@ import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import BudgetCard from "../cards/BudgetCard";
 
 const BudgetList = ({
+  user,
   colors,
   budgets,
   filteredBudgets,
@@ -104,6 +105,7 @@ const BudgetList = ({
                       }}
                     >
                       <BudgetCard
+                        user={user}
                         colors={colors}
                         budget={budget}
                         onEdit={() => handleEditClick(budget)}
@@ -127,6 +129,7 @@ const BudgetList = ({
                       }}
                     >
                       <BudgetCard
+                        user={user}
                         colors={colors}
                         budget={budget}
                         onEdit={() => handleEditClick(budget)}

@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const ExpenseList = ({ expenses, budgets, onDelete, colors }) => {
+const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [filterBudget, setFilterBudget] = useState("all");
@@ -802,6 +802,21 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors }) => {
                             }`}
                           >
                             {expense.name}
+                            {/* NEW: Show creator name if it's a collaborator expense and user is budget owner */}
+                            {expense.isCollaboratorExpense &&
+                              expense.createdBy?.uid !== user.uid && (
+                                <span
+                                  className={`text-xs ml-2 px-2 py-1 rounded-full ${
+                                    colors.background === "#1A1A1A"
+                                      ? "bg-[#4A3426] text-[#D4C4A8]"
+                                      : "bg-amber-100 text-amber-700"
+                                  }`}
+                                >
+                                  by{" "}
+                                  {expense.createdBy?.displayName ||
+                                    expense.createdBy?.email?.split("@")[0]}
+                                </span>
+                              )}
                           </h4>
                           <div
                             className={`flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm ${

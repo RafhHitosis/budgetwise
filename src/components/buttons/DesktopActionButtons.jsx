@@ -61,7 +61,7 @@ const desktopActionButtons = ({
           Object.keys(budgets).length === 0 &&
           Object.keys(expenses).length === 0
         }
-        className="px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 cursor-pointer"
+        className="px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         style={{
           backgroundColor: "#74512D",
           color: "#F8F4E1",

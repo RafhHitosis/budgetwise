@@ -1,6 +1,7 @@
 // components/AuthForm.js
 import React, { useState } from "react";
-import { auth } from "../../firebase";
+import { set, ref } from "firebase/database";
+import { auth, database } from "../../firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -20,12 +21,22 @@ const AuthForm = ({ onLogin }) => {
       const userCredential = isLogin
         ? await signInWithEmailAndPassword(auth, email, password)
         : await createUserWithEmailAndPassword(auth, email, password);
+
+      // If user just signed up, save their email to Realtime Database
+      if (!isLogin) {
+        saveEmailToDatabase(userCredential.user.uid, email);
+      }
+
       onLogin(userCredential.user);
     } catch (error) {
       alert(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const saveEmailToDatabase = (uid, email) => {
+    set(ref(database, `userEmails/${uid}`), email);
   };
 
   return (
