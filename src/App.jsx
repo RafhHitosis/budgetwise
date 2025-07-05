@@ -1,10 +1,9 @@
-// App.js
 import React, { useState, useEffect } from "react";
 import AuthForm from "./components/auth/AuthForm";
 import Dashboard from "./components/Dashboard";
 import { auth } from "./firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import ThemeProvider, { useTheme } from "./contexts/ThemeProvider";
 import "./index.css";
 
 const App = () => {
@@ -24,24 +23,40 @@ const App = () => {
     setUser(null);
   };
 
+  return (
+    <ThemeProvider>
+      <AppContent
+        user={user}
+        loading={loading}
+        onLogin={setUser}
+        onLogout={handleLogout}
+      />
+    </ThemeProvider>
+  );
+};
+
+const AppContent = ({ user, loading, onLogin, onLogout }) => {
+  const { colors } = useTheme();
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        style={{ backgroundColor: colors.background }}
+        className="min-h-screen flex items-center justify-center"
+      >
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-800 border-t-transparent"></div>
       </div>
     );
   }
 
   return (
-    <ThemeProvider>
-      <div className="font-sans">
-        {user ? (
-          <Dashboard user={user} onLogout={handleLogout} />
-        ) : (
-          <AuthForm onLogin={setUser} />
-        )}
-      </div>
-    </ThemeProvider>
+    <div className="font-sans">
+      {user ? (
+        <Dashboard user={user} onLogout={onLogout} />
+      ) : (
+        <AuthForm onLogin={onLogin} />
+      )}
+    </div>
   );
 };
 

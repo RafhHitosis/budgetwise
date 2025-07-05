@@ -1,6 +1,5 @@
-// components/Header.js
 import React from "react";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../contexts/ThemeProvider";
 import { Moon, Sun, Download, Menu, X, Clock, LogOut } from "lucide-react";
 
 const Header = ({
@@ -14,41 +13,31 @@ const Header = ({
 }) => {
   const { isDarkMode, toggleTheme, colors } = useTheme();
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString("en-PH", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  // Consolidated date/time formatting
+  const formatDateTime = (date, isMobile = false) => {
+    const dateOptions = isMobile
+      ? { month: "short", day: "numeric" }
+      : { weekday: "short", year: "numeric", month: "short", day: "numeric" };
+
+    const timeOptions = { hour: "numeric", minute: "2-digit", hour12: true };
+
+    const formattedDate = date.toLocaleDateString("en-PH", dateOptions);
+    const formattedTime = date.toLocaleTimeString("en-PH", timeOptions);
+
+    return isMobile
+      ? `${formattedDate} • ${formattedTime}`
+      : `${formattedDate} | ${formattedTime}`;
   };
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString("en-PH", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
+  const handleExportClick = () => {
+    setShowExportReport(true);
+    setMobileMenuOpen(false);
   };
 
-  const formatDateTime = (date) => {
-    return `${formatDate(date)} | ${formatTime(date)}`;
-  };
-
-  const formatMobileDate = (date) => {
-    return date.toLocaleDateString("en-PH", {
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const formatMobileTime = (date) => {
-    return date.toLocaleTimeString("en-PH", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
+  const baseButtonStyles =
+    "flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300";
+  const mobileButtonStyles =
+    "flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md";
 
   return (
     <header
@@ -60,7 +49,7 @@ const Header = ({
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-18">
-          {/* Logo Section - Enhanced with Animation */}
+          {/* Logo Section */}
           <div className="flex items-center min-w-0 flex-1">
             <div className="flex items-center space-x-2 sm:space-x-4">
               <div
@@ -81,15 +70,14 @@ const Header = ({
                 >
                   Expense Tracker
                 </h1>
-                {/* Mobile Date and Time - Always Visible */}
+                {/* Mobile Date and Time */}
                 <div className="lg:hidden flex items-center space-x-1 mt-0.5">
                   <Clock className="w-3 h-3" style={{ color: colors.text }} />
                   <span
                     className="text-xs font-medium"
                     style={{ color: colors.text }}
                   >
-                    {formatMobileDate(currentDateTime)} •{" "}
-                    {formatMobileTime(currentDateTime)}
+                    {formatDateTime(currentDateTime, true)}
                   </span>
                 </div>
               </div>
@@ -98,14 +86,11 @@ const Header = ({
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-4">
-            {/* Theme Toggle Button */}
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
-              style={{
-                backgroundColor: colors.accent,
-                color: colors.text,
-              }}
+              className={`${baseButtonStyles} cursor-pointer`}
+              style={{ backgroundColor: colors.accent, color: colors.text }}
               title={`Switch to ${isDarkMode ? "Light" : "Dark"} Mode`}
             >
               {isDarkMode ? (
@@ -118,13 +103,10 @@ const Header = ({
               </span>
             </button>
 
-            {/* Combined Date and Time Display */}
+            {/* Date and Time Display */}
             <div
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm transform hover:scale-105 transition-all duration-300"
-              style={{
-                backgroundColor: colors.surface,
-                color: colors.text,
-              }}
+              className={baseButtonStyles}
+              style={{ backgroundColor: colors.surface, color: colors.text }}
             >
               <span className="text-sm font-medium">
                 {formatDateTime(currentDateTime)}
@@ -133,9 +115,9 @@ const Header = ({
 
             {/* Export Button */}
             <button
-              onClick={() => setShowExportReport(true)}
+              onClick={handleExportClick}
               disabled={Object.keys(budgets).length === 0}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className={`${baseButtonStyles} disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
               style={{
                 backgroundColor: colors.buttonPrimary,
                 color: colors.text,
@@ -146,18 +128,18 @@ const Header = ({
               <span className="text-sm font-medium">Export</span>
             </button>
 
+            {/* User Email */}
             <span
               className="text-sm max-w-[150px] truncate px-3 py-2 rounded-lg"
-              style={{
-                color: colors.text,
-                backgroundColor: colors.surface,
-              }}
+              style={{ color: colors.text, backgroundColor: colors.surface }}
             >
               Welcome, {user.email}
             </span>
+
+            {/* Sign Out Button */}
             <button
               onClick={handleSignOut}
-              className="px-5 py-2.5 rounded-xl font-medium shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 whitespace-nowrap cursor-pointer"
+              className={`${baseButtonStyles} cursor-pointer`}
               style={{
                 backgroundColor: colors.buttonSecondary,
                 color: colors.text,
@@ -172,10 +154,7 @@ const Header = ({
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2.5 sm:p-3 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 flex-shrink-0"
-              style={{
-                backgroundColor: colors.accent,
-                color: "white",
-              }}
+              style={{ backgroundColor: colors.accent, color: "white" }}
             >
               {mobileMenuOpen ? (
                 <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -186,7 +165,7 @@ const Header = ({
           </div>
         </div>
 
-        {/* Mobile Navigation Menu - Enhanced */}
+        {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
           <div
             className="lg:hidden animate-slide-down px-4 py-6 space-y-6"
@@ -199,20 +178,17 @@ const Header = ({
             {/* User Info */}
             <div
               className="text-center p-3 rounded-xl font-medium"
-              style={{
-                backgroundColor: colors.cardBg,
-                color: colors.text,
-              }}
+              style={{ backgroundColor: colors.cardBg, color: colors.text }}
             >
               👋 Welcome, {user.email}
             </div>
 
-            {/* Actions Grid */}
+            {/* Mobile Actions */}
             <div className="grid grid-cols-1 gap-4">
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                className={mobileButtonStyles}
                 style={{
                   backgroundColor: colors.accent,
                   color: isDarkMode ? "#F8F4E1" : "#ffffff",
@@ -230,12 +206,9 @@ const Header = ({
 
               {/* Export Report */}
               <button
-                onClick={() => {
-                  setShowExportReport(true);
-                  setMobileMenuOpen(false);
-                }}
+                onClick={handleExportClick}
                 disabled={Object.keys(budgets).length === 0}
-                className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md disabled:opacity-50"
+                className={`${mobileButtonStyles} disabled:opacity-50`}
                 style={{
                   backgroundColor: colors.secondary,
                   color: isDarkMode ? "#F8F4E1" : "#ffffff",
@@ -250,7 +223,7 @@ const Header = ({
               {/* Sign Out */}
               <button
                 onClick={handleSignOut}
-                className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md"
+                className={mobileButtonStyles}
                 style={{
                   backgroundColor: colors.primary,
                   color: isDarkMode ? "#F8F4E1" : "#ffffff",

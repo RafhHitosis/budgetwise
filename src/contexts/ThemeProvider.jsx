@@ -1,8 +1,12 @@
-// contexts/ThemeContext.js
+/* eslint-disable react-refresh/only-export-components */
+
+// src/contexts/ThemeProvider.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+// 1. Create the ThemeContext
 const ThemeContext = createContext();
 
+// 2. Custom hook to use the theme
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
@@ -11,9 +15,9 @@ export const useTheme = () => {
   return context;
 };
 
-export const ThemeProvider = ({ children }) => {
+// 3. The provider component that wraps your app
+const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage or default to false
     const saved = localStorage.getItem("darkMode");
     return saved ? JSON.parse(saved) : false;
   });
@@ -75,7 +79,6 @@ export const ThemeProvider = ({ children }) => {
         },
   };
 
-  // Apply theme to document body
   useEffect(() => {
     document.body.style.backgroundColor = theme.colors.background;
     document.body.style.color = theme.colors.text;
@@ -88,4 +91,4 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
-export default ThemeContext;
+export default ThemeProvider;
