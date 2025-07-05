@@ -179,7 +179,7 @@ const CollaboratorManager = ({ user, budget, colors }) => {
 
   return (
     <div
-      style={{ marginTop: "-18px" }}
+      style={{ marginTop: "-15px" }}
       className="w-full max-w-4xl mx-auto sm:px-4"
     >
       <div
@@ -213,7 +213,7 @@ const CollaboratorManager = ({ user, budget, colors }) => {
               </h3>
               {collaborators.length > 0 && (
                 <span
-                  className="text-xs font-medium px-2.5 py-1 rounded-full"
+                  className="text-[10px] font-medium px-2 py-0.5 rounded-full"
                   style={{
                     backgroundColor: colors.text,
                     color: colors.cardBg,

@@ -236,17 +236,42 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
   const handleEditBudget = async (budgetData) => {
-    await set(ref(database, `budgets/${user.uid}/${editingBudget.id}`), {
-      ...budgetData,
-      id: editingBudget.id,
-    });
-    setEditingBudget(null);
+    try {
+      // Find the budget owner - could be current user or someone else if this is a collaborative budget
+      const budgetOwner = editingBudget.owner || user.uid;
+
+      // Update the budget under the correct owner's path
+      await set(ref(database, `budgets/${budgetOwner}/${editingBudget.id}`), {
+        ...budgetData,
+        id: editingBudget.id,
+        owner: budgetOwner, // Preserve the original owner
+        collaborators: editingBudget.collaborators || {}, // Preserve collaborators
+      });
+
+      setEditingBudget(null);
+    } catch (error) {
+      console.error("Error editing budget:", error);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleDeleteBudget = (budgetId) => {
+    // Find the budget to get the owner
+    const budget = budgets[budgetId];
+    if (!budget) return;
+
+    const budgetOwner = budget.owner || user.uid;
+
     openConfirmModal(
-      async () =>
-        await remove(ref(database, `budgets/${user.uid}/${budgetId}`)),
+      async () => {
+        try {
+          // Delete from the correct owner's path
+          await remove(ref(database, `budgets/${budgetOwner}/${budgetId}`));
+        } catch (error) {
+          console.error("Error deleting budget:", error);
+          // You might want to show an error message to the user here
+        }
+      },
       "Delete Budget",
       "This action cannot be undone."
     );
@@ -346,17 +371,16 @@ const Dashboard = ({ user, onLogout }) => {
             });
           }
 
-          // Delete from current user's expenses
+          // Always delete from current user's expenses first
           await remove(ref(database, `expenses/${user.uid}/${expenseId}`));
 
-          // If this expense was created by a collaborator, also delete from budget owner's expenses
+          // Handle collaborative expense deletion
           if (budgetOwner && budgetOwner !== user.uid) {
-            // Find and delete the corresponding expense in owner's list
+            // If current user is a collaborator, find and delete from budget owner's expenses
             const ownerExpensesRef = ref(database, `expenses/${budgetOwner}`);
             const ownerSnapshot = await get(ownerExpensesRef);
             const ownerExpenses = ownerSnapshot.val() || {};
 
-            // Find matching expense by budgetId, amount, date, and createdBy
             const matchingExpenseId = Object.keys(ownerExpenses).find((id) => {
               const ownerExpense = ownerExpenses[id];
               return (
@@ -371,6 +395,39 @@ const Dashboard = ({ user, onLogout }) => {
               await remove(
                 ref(database, `expenses/${budgetOwner}/${matchingExpenseId}`)
               );
+            }
+          } else if (budgetOwner === user.uid) {
+            // If current user is the budget owner, delete from all collaborators' expenses
+            const collaborators = budget.collaborators || {};
+
+            for (const collaboratorId of Object.keys(collaborators)) {
+              const collaboratorExpensesRef = ref(
+                database,
+                `expenses/${collaboratorId}`
+              );
+              const collaboratorSnapshot = await get(collaboratorExpensesRef);
+              const collaboratorExpenses = collaboratorSnapshot.val() || {};
+
+              const matchingCollaboratorExpenseId = Object.keys(
+                collaboratorExpenses
+              ).find((id) => {
+                const collaboratorExpense = collaboratorExpenses[id];
+                return (
+                  collaboratorExpense.budgetId === expense.budgetId &&
+                  collaboratorExpense.amount === expense.amount &&
+                  collaboratorExpense.date === expense.date &&
+                  collaboratorExpense.createdBy?.uid === expense.createdBy?.uid
+                );
+              });
+
+              if (matchingCollaboratorExpenseId) {
+                await remove(
+                  ref(
+                    database,
+                    `expenses/${collaboratorId}/${matchingCollaboratorExpenseId}`
+                  )
+                );
+              }
             }
           }
         } catch (error) {

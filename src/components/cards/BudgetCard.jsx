@@ -67,11 +67,13 @@ const BudgetCard = ({
             </div>
             <div className="flex items-center space-x-2 ml-2">
               <div className="p-2 rounded-full" style={{ color: colors.text }}>
-                {isExpanded ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
+                <div
+                  className={`transition-transform duration-300 ${
+                    isExpanded ? "rotate-180" : "rotate-0"
+                  }`}
+                >
                   <ChevronDown className="w-4 h-4" />
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -102,9 +104,13 @@ const BudgetCard = ({
           </div>
         </div>
 
-        {/* Expandable Details */}
-        {isExpanded && (
-          <div className="px-4 pb-4 space-y-3 animate-fade-in">
+        {/* Expandable Details with Smooth Animation */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="px-4 pb-4 space-y-3">
             <div
               className="pt-3 border-t"
               style={{ borderColor: colors.border }}
@@ -134,7 +140,7 @@ const BudgetCard = ({
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons with Staggered Animation */}
               <div
                 className="flex justify-center space-x-4 mt-4 pt-3 border-t"
                 style={{ borderColor: colors.border }}
@@ -144,7 +150,11 @@ const BudgetCard = ({
                     e.stopPropagation();
                     onEdit(budget);
                   }}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 active:scale-95"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 active:scale-95 transform ${
+                    isExpanded
+                      ? "translate-y-0 opacity-100 delay-100"
+                      : "translate-y-4 opacity-0"
+                  }`}
                   style={{
                     backgroundColor: colors.border,
                     color: colors.text,
@@ -160,7 +170,11 @@ const BudgetCard = ({
                     e.stopPropagation();
                     onDelete(budget.id);
                   }}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 active:scale-95"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 active:scale-95 transform ${
+                    isExpanded
+                      ? "translate-y-0 opacity-100 delay-150"
+                      : "translate-y-4 opacity-0"
+                  }`}
                   style={{
                     backgroundColor: "#fee2e2",
                     color: "#dc2626",
@@ -174,7 +188,7 @@ const BudgetCard = ({
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Desktop View - Original Layout */}
