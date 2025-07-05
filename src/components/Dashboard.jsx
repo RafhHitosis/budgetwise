@@ -16,7 +16,15 @@ import BudgetList from "./list/BudgetList";
 import ExpenseList from "./list/ExpenseList";
 import ExportReport from "./Reports/ExportReport";
 import { database } from "../firebase";
-import { ref, onValue, push, set, remove, get } from "firebase/database";
+import {
+  ref,
+  onValue,
+  push,
+  set,
+  remove,
+  get,
+  runTransaction,
+} from "firebase/database";
 import GoalList from "./list/GoalList";
 import MobileFab from "./MobileFab";
 import Modal from "./modals/Modal";
@@ -161,7 +169,7 @@ const Dashboard = ({ user, onLogout }) => {
       const allBudgets = snapshot.val() || {};
       const visibleBudgets = {};
 
-      // Loop through all users’ budgets
+      // Loop through all users' budgets
       Object.entries(allBudgets).forEach(([ownerId, userBudgets]) => {
         Object.entries(userBudgets).forEach(([budgetId, budget]) => {
           const isOwner = budget.owner === user.uid;
@@ -245,58 +253,64 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
   const handleAddExpense = async (expenseData) => {
-    const newRef = push(ref(database, `expenses/${user.uid}`));
+    try {
+      const newRef = push(ref(database, `expenses/${user.uid}`));
+      const expenseId = newRef.key;
 
-    await set(newRef, {
-      ...expenseData,
-      id: newRef.key,
-      createdBy: {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName || user.email.split("@")[0], // Add display name
-      },
-    });
+      // Create the expense object
+      const expenseObject = {
+        ...expenseData,
+        id: expenseId,
+        createdBy: {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || user.email.split("@")[0],
+        },
+      };
 
-    const targetBudget = Object.values(budgets).find(
-      (b) => b.id === expenseData.budgetId
-    );
+      // Add expense to current user's expenses
+      await set(newRef, expenseObject);
 
-    if (targetBudget) {
-      const budgetRef = ref(
-        database,
-        `budgets/${targetBudget.owner}/${expenseData.budgetId}`
+      const targetBudget = Object.values(budgets).find(
+        (b) => b.id === expenseData.budgetId
       );
 
-      const snapshot = await get(budgetRef);
-      const currentBudget = snapshot.val();
+      if (targetBudget) {
+        const budgetRef = ref(
+          database,
+          `budgets/${targetBudget.owner}/${expenseData.budgetId}`
+        );
 
-      if (currentBudget) {
-        await set(budgetRef, {
-          ...currentBudget,
-          spent: currentBudget.spent + expenseData.amount,
+        // Use atomic transaction to update budget spent amount
+        await runTransaction(budgetRef, (currentBudget) => {
+          if (currentBudget) {
+            return {
+              ...currentBudget,
+              spent: (currentBudget.spent || 0) + expenseData.amount,
+            };
+          }
+          return currentBudget;
         });
 
-        // NEW: If this is a collaborative budget, also add expense to budget owner's expenses
+        // If this is a collaborative budget, also add expense to budget owner's expenses
         if (targetBudget.owner !== user.uid) {
           const ownerExpenseRef = push(
             ref(database, `expenses/${targetBudget.owner}`)
           );
           await set(ownerExpenseRef, {
-            ...expenseData,
+            ...expenseObject,
             id: ownerExpenseRef.key,
-            createdBy: {
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName || user.email.split("@")[0],
-            },
             isCollaboratorExpense: true, // Flag to identify collaborator expenses
           });
         }
       }
-    }
 
-    setShowExpenseForm(false);
-    setShowFABMenu(false);
+      setShowExpenseForm(false);
+      setShowFABMenu(false);
+    } catch (error) {
+      console.error("Error adding expense:", error);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleDeleteExpense = (expenseId) => {
@@ -310,48 +324,58 @@ const Dashboard = ({ user, onLogout }) => {
 
     openConfirmModal(
       async () => {
-        if (budget && budgetOwner) {
-          const budgetRef = ref(
-            database,
-            `budgets/${budgetOwner}/${expense.budgetId}`
-          );
-          const snapshot = await get(budgetRef);
-          const currentBudget = snapshot.val();
-          if (currentBudget) {
-            await set(budgetRef, {
-              ...currentBudget,
-              spent: currentBudget.spent - expense.amount,
+        try {
+          if (budget && budgetOwner) {
+            const budgetRef = ref(
+              database,
+              `budgets/${budgetOwner}/${expense.budgetId}`
+            );
+
+            // Use atomic transaction to update budget spent amount
+            await runTransaction(budgetRef, (currentBudget) => {
+              if (currentBudget) {
+                return {
+                  ...currentBudget,
+                  spent: Math.max(
+                    0,
+                    (currentBudget.spent || 0) - expense.amount
+                  ),
+                };
+              }
+              return currentBudget;
             });
           }
-        }
 
-        // Delete from current user's expenses
-        await remove(ref(database, `expenses/${user.uid}/${expenseId}`));
+          // Delete from current user's expenses
+          await remove(ref(database, `expenses/${user.uid}/${expenseId}`));
 
-        // NEW: If this is a collaborator expense, also delete from budget owner's expenses
-        // NEW: If this expense was created by a collaborator, also delete from budget owner's expenses
-        if (budgetOwner && budgetOwner !== user.uid) {
-          // Find and delete the corresponding expense in owner's list
-          const ownerExpensesRef = ref(database, `expenses/${budgetOwner}`);
-          const ownerSnapshot = await get(ownerExpensesRef);
-          const ownerExpenses = ownerSnapshot.val() || {};
+          // If this expense was created by a collaborator, also delete from budget owner's expenses
+          if (budgetOwner && budgetOwner !== user.uid) {
+            // Find and delete the corresponding expense in owner's list
+            const ownerExpensesRef = ref(database, `expenses/${budgetOwner}`);
+            const ownerSnapshot = await get(ownerExpensesRef);
+            const ownerExpenses = ownerSnapshot.val() || {};
 
-          // Find matching expense by budgetId, amount, date, and createdBy
-          const matchingExpenseId = Object.keys(ownerExpenses).find((id) => {
-            const ownerExpense = ownerExpenses[id];
-            return (
-              ownerExpense.budgetId === expense.budgetId &&
-              ownerExpense.amount === expense.amount &&
-              ownerExpense.date === expense.date &&
-              ownerExpense.createdBy?.uid === expense.createdBy?.uid
-            );
-          });
+            // Find matching expense by budgetId, amount, date, and createdBy
+            const matchingExpenseId = Object.keys(ownerExpenses).find((id) => {
+              const ownerExpense = ownerExpenses[id];
+              return (
+                ownerExpense.budgetId === expense.budgetId &&
+                ownerExpense.amount === expense.amount &&
+                ownerExpense.date === expense.date &&
+                ownerExpense.createdBy?.uid === expense.createdBy?.uid
+              );
+            });
 
-          if (matchingExpenseId) {
-            await remove(
-              ref(database, `expenses/${budgetOwner}/${matchingExpenseId}`)
-            );
+            if (matchingExpenseId) {
+              await remove(
+                ref(database, `expenses/${budgetOwner}/${matchingExpenseId}`)
+              );
+            }
           }
+        } catch (error) {
+          console.error("Error deleting expense:", error);
+          // You might want to show an error message to the user here
         }
       },
       "Delete Expense",
