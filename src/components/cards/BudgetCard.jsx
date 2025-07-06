@@ -1,7 +1,7 @@
 // components/BudgetCard.js
 import React, { useEffect, useState } from "react";
-import { Edit3, Trash2, ChevronDown, ChevronUp } from "lucide-react";
-import CollaboratorManager from "../collab/CollaboratorManager ";
+import { Edit3, Trash2, ChevronDown, ChevronUp, Users } from "lucide-react";
+import CollaboratorManager from "../collab/CollaboratorManager";
 
 const BudgetCard = ({
   budget,
@@ -104,6 +104,25 @@ const BudgetCard = ({
           </div>
         </div>
 
+        {/* Collaborator section for mobile - placed between main content and details */}
+        <div className="px-4 pb-2">
+          <div className="flex items-center space-x-2 mb-2">
+            <Users
+              className="w-4 h-4"
+              style={{ color: colors.secondaryText }}
+            />
+            <span
+              className="text-sm font-medium"
+              style={{ color: colors.secondaryText }}
+            >
+              Collaborators
+            </span>
+          </div>
+          <div className="bg-opacity-30 rounded-lg p-3">
+            <CollaboratorManager user={user} budget={budget} colors={colors} />
+          </div>
+        </div>
+
         {/* Expandable Details with Smooth Animation */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
@@ -191,10 +210,10 @@ const BudgetCard = ({
         </div>
       </div>
 
-      {/* Desktop View - Original Layout */}
+      {/* Desktop View - Original Layout with Modern Collaborator Placement */}
       <div className="hidden sm:block p-6">
         <div className="flex justify-between items-start mb-4">
-          <div>
+          <div className="flex-1">
             <h3
               className="text-lg font-semibold"
               style={{ color: colors.text }}
@@ -205,21 +224,35 @@ const BudgetCard = ({
               Budget
             </p>
           </div>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => onEdit(budget)}
-              className="p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-500 transition-colors cursor-pointer"
-              style={{ color: colors.text }}
-            >
-              <Edit3 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onDelete(budget.id)}
-              className="p-2 rounded-full hover:bg-opacity-20 hover:bg-red-500 transition-colors cursor-pointer"
-              style={{ color: colors.text }}
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+
+          {/* Collaborator section in header area for desktop */}
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <div className="relative bg-opacity-20 rounded-lg px-3 py-1">
+                <CollaboratorManager
+                  user={user}
+                  budget={budget}
+                  colors={colors}
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-2">
+              <button
+                onClick={() => onEdit(budget)}
+                className="p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-500 transition-colors cursor-pointer"
+                style={{ color: colors.text }}
+              >
+                <Edit3 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(budget.id)}
+                className="p-2 rounded-full hover:bg-opacity-20 hover:bg-red-500 transition-colors cursor-pointer"
+                style={{ color: colors.text }}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -254,10 +287,6 @@ const BudgetCard = ({
             </span>
           </div>
         </div>
-      </div>
-
-      <div className="w-full sm:w-[90%] mx-auto">
-        <CollaboratorManager user={user} budget={budget} colors={colors} />
       </div>
     </div>
   );

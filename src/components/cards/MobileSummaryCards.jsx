@@ -1,74 +1,167 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 const MobileSummaryCards = ({ totalBudget, totalSpent, colors }) => {
+  const scrollRef = useRef();
+
+  useEffect(() => {
+    // Center the middle card (e.g. index 1 of 3 cards)
+    if (scrollRef.current && scrollRef.current.children[1]) {
+      scrollRef.current.children[1].scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, []);
+
   const remaining = totalBudget - totalSpent;
+  const spentPercentage =
+    totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   const summaryCards = [
     {
       title: "Total Budget",
       value: totalBudget,
       backgroundColor: colors.summaryCard1,
+      badge: "BUDGET",
       icon: (
-        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-            clipRule="evenodd"
-          />
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
         </svg>
       ),
+      subtitle: "Available funds",
     },
     {
       title: "Total Spent",
       value: totalSpent,
       backgroundColor: colors.summaryCard2,
+      badge: "SPENT",
       icon: (
-        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-            clipRule="evenodd"
-          />
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
         </svg>
       ),
+      subtitle: `${spentPercentage.toFixed(1)}% of budget`,
+      showProgress: true,
     },
     {
-      title: "Remaining",
-      value: remaining,
+      title: remaining >= 0 ? "Remaining" : "Over Budget",
+      value: Math.abs(remaining),
       backgroundColor: colors.summaryCard3,
+      badge: remaining >= 0 ? "LEFT" : "OVER",
       icon: (
-        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-            clipRule="evenodd"
-          />
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" />
         </svg>
       ),
+      subtitle: remaining >= 0 ? "Within budget" : "Exceeded limit",
+      isOverBudget: remaining < 0,
     },
   ];
 
   return (
     <div className="lg:hidden mb-8">
-      <div className="flex space-x-4 overflow-x-auto scrollbar-hide px-1 py-2">
-        {summaryCards.map((card) => (
-          <div key={card.title} className="flex-shrink-0 w-64 sm:w-72">
+      <div
+        ref={scrollRef}
+        className="flex space-x-4 overflow-x-auto scrollbar-hide px-4 py-2 snap-x snap-mandatory"
+      >
+        {summaryCards.map((card, index) => (
+          <div
+            key={card.title}
+            className="flex-shrink-0 w-64 sm:w-72 snap-center"
+          >
             <div
-              className="rounded-2xl p-6 shadow-lg transform hover:scale-105 transition-all duration-300 relative overflow-hidden"
+              className="group relative rounded-3xl p-6 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 ease-out overflow-hidden"
               style={{
                 backgroundColor: card.backgroundColor,
                 color: colors.text,
               }}
             >
-              {/* Background Icon */}
-              <div className="absolute top-4 right-4 opacity-20">
-                {card.icon}
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-5">
+                {index === 0 && (
+                  <>
+                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-current transform translate-x-12 -translate-y-12"></div>
+                    <div className="absolute bottom-0 left-0 w-16 h-16 rounded-full bg-current transform -translate-x-8 translate-y-8"></div>
+                  </>
+                )}
+                {index === 1 && (
+                  <>
+                    <div className="absolute top-0 left-0 w-24 h-24 rounded-full bg-current transform -translate-x-12 -translate-y-12"></div>
+                    <div className="absolute bottom-0 right-0 w-16 h-16 rounded-full bg-current transform translate-x-8 translate-y-8"></div>
+                  </>
+                )}
+                {index === 2 && (
+                  <>
+                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-current transform translate-x-12 -translate-y-12"></div>
+                    <div className="absolute bottom-0 left-0 w-16 h-16 rounded-full bg-current transform -translate-x-8 translate-y-8"></div>
+                  </>
+                )}
               </div>
+
+              {/* Content */}
               <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-sm flex items-center justify-center">
+                    {card.icon}
+                  </div>
+                  <div className="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm">
+                    {card.badge}
+                  </div>
+                </div>
+
                 <p className="text-sm font-medium opacity-80 mb-2">
                   {card.title}
                 </p>
-                <p className="text-2xl font-bold">₱{card.value.toFixed(2)}</p>
+                <p
+                  className={`text-2xl sm:text-3xl font-bold mb-3 ${
+                    card.isOverBudget ? "text-red-400" : ""
+                  }`}
+                >
+                  ₱
+                  {card.value.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
+
+                {/* Progress Bar for Spent Card */}
+                {card.showProgress && (
+                  <div className="mb-2">
+                    <div className="w-full bg-white/20 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-white/60 to-white/80 h-2 rounded-full transition-all duration-700 ease-out"
+                        style={{ width: `${Math.min(spentPercentage, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Status Indicator */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-xs opacity-70">
+                    <div
+                      className={`w-2 h-2 rounded-full mr-2 ${
+                        card.isOverBudget
+                          ? "bg-red-400"
+                          : card.showProgress
+                          ? "bg-current"
+                          : "bg-green-400"
+                      }`}
+                    ></div>
+                    {card.subtitle}
+                  </div>
+
+                  {card.title === "Remaining" && remaining >= 0 && (
+                    <div className="text-xs opacity-70">
+                      {totalBudget > 0
+                        ? `${((remaining / totalBudget) * 100).toFixed(
+                            1
+                          )}% left`
+                        : "0% left"}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

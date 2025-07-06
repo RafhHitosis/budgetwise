@@ -556,7 +556,7 @@ const ChangePassword = ({ isOpen, onClose, user }) => {
               type="button"
               onClick={handleClose}
               disabled={loading}
-              className="w-full sm:flex-1 px-4 py-3 rounded-xl border font-medium transition-colors duration-200 disabled:opacity-50"
+              className="w-full sm:flex-1 px-4 py-3 rounded-xl border font-medium transition-colors duration-200 disabled:opacity-50 cursor-pointer"
               style={{
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
@@ -575,7 +575,7 @@ const ChangePassword = ({ isOpen, onClose, user }) => {
                 newPassword !== confirmPassword ||
                 currentPasswordError
               }
-              className="w-full sm:flex-1 px-4 py-3 rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 flex items-center justify-center space-x-2"
+              className="w-full sm:flex-1 px-4 py-3 rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 flex items-center justify-center space-x-2 cursor-pointer"
               style={{
                 backgroundColor: colors.buttonPrimary,
                 color: colors.text,

@@ -128,7 +128,22 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel, colors }) => {
               style={{ color: colors.text }}
               className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#543310]"
             >
-              ▼
+              {/* Chevron Down SVG */}
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 8l4 4 4-4"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </div>
           </div>
         </div>
@@ -145,7 +160,7 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel, colors }) => {
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0 mt-6">
           <button
             onClick={handleSubmit}
             disabled={uploading}

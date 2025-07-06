@@ -56,7 +56,7 @@ const Dashboard = ({ user, onLogout }) => {
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [budgetsPerPage] = useState(3);
+  const [budgetsPerPage] = useState(2);
 
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
