@@ -61,8 +61,12 @@ const BudgetCard = ({
               >
                 {budget.name}
               </h3>
-              <p style={{ color: colors.secondaryText }} className="text-xs">
-                Budget
+              <p className="text-xs" style={{ color: colors.secondaryText }}>
+                {new Date(budget.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
               </p>
             </div>
             <div className="flex items-center space-x-2 ml-2">
@@ -220,8 +224,12 @@ const BudgetCard = ({
             >
               {budget.name}
             </h3>
-            <p style={{ color: colors.secondaryText }} className="text-sm">
-              Budget
+            <p className="text-sm" style={{ color: colors.secondaryText }}>
+              {new Date(budget.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
             </p>
           </div>
 

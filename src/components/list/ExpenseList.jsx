@@ -395,9 +395,11 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-700 w-4 h-4" />
             <input
+              id="searchExpenses"
               type="text"
               placeholder="Search expenses..."
               value={searchTerm}
+              name="search"
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ borderColor: colors.border }}
               className="w-full pl-10 pr-4 py-2 sm:py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-800 focus:border-transparent"

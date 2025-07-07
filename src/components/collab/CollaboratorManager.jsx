@@ -373,7 +373,7 @@ const CollaboratorManager = ({ user, budget, colors }) => {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={() => setShowAddForm(false)}
-                    className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl font-medium text-sm transition-all duration-200 hover:opacity-90 order-2 sm:order-1"
+                    className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl font-medium text-sm transition-all duration-200 hover:opacity-90 order-2 sm:order-1 cursor-pointer"
                     style={{
                       backgroundColor: colors.surface,
                       color: colors.text,

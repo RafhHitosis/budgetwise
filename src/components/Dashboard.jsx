@@ -82,6 +82,13 @@ const Dashboard = ({ user, onLogout }) => {
     startIndex + budgetsPerPage
   );
 
+  useEffect(() => {
+    // If current page has no data but there are items in other pages
+    if (currentPage > 1 && currentBudgets.length === 0) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  }, [filteredBudgets, currentBudgets.length, currentPage]);
+
   // Calculated values
   const totalBudget = Object.values(budgets).reduce(
     (sum, b) => sum + b.amount,
@@ -224,13 +231,43 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
   const handleAddBudget = async (budgetData) => {
-    const newRef = push(ref(database, `budgets/${user.uid}`));
-    await set(newRef, {
-      ...budgetData,
-      id: newRef.key,
-      owner: user.uid,
-      collaborators: {}, // Start empty
-    });
+    const existingBudget = Object.values(budgets).find(
+      (b) =>
+        b.name.toLowerCase() === budgetData.name.toLowerCase() &&
+        b.owner === user.uid
+    );
+
+    if (existingBudget) {
+      openConfirmModal(
+        async () => {
+          // Option to increase amount
+          const budgetRef = ref(
+            database,
+            `budgets/${user.uid}/${existingBudget.id}`
+          );
+          await runTransaction(budgetRef, (currentBudget) => {
+            if (currentBudget) {
+              return {
+                ...currentBudget,
+                amount: currentBudget.amount + budgetData.amount,
+              };
+            }
+            return currentBudget;
+          });
+        },
+        "Duplicate Budget Found",
+        `A budget named "${budgetData.name}" already exists. Do you want to add the amount to the existing budget?`
+      );
+    } else {
+      const newRef = push(ref(database, `budgets/${user.uid}`));
+      await set(newRef, {
+        ...budgetData,
+        id: newRef.key,
+        owner: user.uid,
+        collaborators: {},
+      });
+    }
+
     setShowBudgetForm(false);
     setShowFABMenu(false);
   };
