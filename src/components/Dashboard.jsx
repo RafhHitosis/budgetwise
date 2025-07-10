@@ -597,21 +597,32 @@ const Dashboard = ({ user, onLogout }) => {
               />
 
               {/* Expenses Section */}
-              <div
-                className="rounded-2xl shadow-lg p-1 sm:p-6 md:p-8"
-                style={{ backgroundColor: colors.cardBg }}
-              >
-                {expensesLoading ? (
-                  <ExpensesSkeleton />
-                ) : (
-                  <ExpenseList
-                    user={user}
-                    colors={colors}
-                    expenses={expenses}
-                    budgets={budgets}
-                    onDelete={handleDeleteExpense}
-                  />
-                )}
+              <div className="space-y-4">
+                {/* Title Label - Outside the card */}
+                <h2
+                  style={{ color: colors.text }}
+                  className="text-xl sm:text-xl font-bold"
+                >
+                  Recent Expenses
+                </h2>
+
+                {/* Card Container */}
+                <div
+                  className="rounded-2xl shadow-lg"
+                  style={{ backgroundColor: colors.cardBg }}
+                >
+                  {expensesLoading ? (
+                    <ExpensesSkeleton />
+                  ) : (
+                    <ExpenseList
+                      user={user}
+                      colors={colors}
+                      expenses={expenses}
+                      budgets={budgets}
+                      onDelete={handleDeleteExpense}
+                    />
+                  )}
+                </div>
               </div>
             </>
           )}

@@ -5,7 +5,7 @@ const GoalList = ({ colors, goals, handleGoalEditClick, handleDeleteGoal }) => {
   return (
     <div className="space-y-6 xl:col-span-2">
       <h2
-        className="text-xl sm:text-2xl font-bold"
+        className="text-xl sm:text-xl font-bold"
         style={{ color: colors.text }}
       >
         Your Goals

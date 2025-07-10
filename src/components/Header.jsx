@@ -84,13 +84,10 @@ const Header = ({
     setMobileMenuOpen(false);
   };
 
-  const baseButtonStyles =
-    "flex items-center space-x-2 px-4 py-2.5 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300";
-
   return (
     <>
       <header
-        className="shadow-lg border-b sticky top-0 z-40 transition-all duration-300"
+        className="shadow-lg border-b sticky top-0 z-40 transition-all duration-300 backdrop-blur-md"
         style={{
           backgroundColor: colors.surface,
           borderBottomColor: colors.border,
@@ -101,26 +98,59 @@ const Header = ({
             {/* Logo Section */}
             <div className="flex items-center min-w-0 flex-1">
               <div className="flex items-center space-x-2 sm:space-x-4">
-                <div
-                  className="flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl shadow-md transform hover:scale-105 transition-all duration-300 flex-shrink-0"
-                  style={{ backgroundColor: "#74512D" }}
-                >
-                  <span
-                    className="text-xl sm:text-3xl font-semibold"
-                    style={{ color: "#F8F4E1" }}
+                {/* Mobile Logo (unchanged) */}
+                <div className="lg:hidden">
+                  <div
+                    className="flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl shadow-md transform hover:scale-105 transition-all duration-300 flex-shrink-0"
+                    style={{ backgroundColor: "#74512D" }}
                   >
-                    ₱
-                  </span>
+                    <span
+                      className="text-xl sm:text-3xl font-semibold"
+                      style={{ color: "#F8F4E1" }}
+                    >
+                      ₱
+                    </span>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
+
+                {/* Desktop Logo (modernized) */}
+                <div className="hidden lg:flex items-center space-x-3">
+                  <div
+                    className="flex items-center justify-center w-10 h-10 rounded-lg shadow-sm"
+                    style={{ backgroundColor: "#74512D" }}
+                  >
+                    <span
+                      className="text-lg font-bold"
+                      style={{ color: "#F8F4E1" }}
+                    >
+                      ₱
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <h1
+                      className="text-lg font-bold leading-none"
+                      style={{ color: colors.text }}
+                    >
+                      Expense Tracker
+                    </h1>
+                    <span
+                      className="text-xs font-medium opacity-70"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Personal Finance Manager
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mobile Title and Date (unchanged) */}
+                <div className="lg:hidden min-w-0 flex-1">
                   <h1
                     className="text-base sm:text-2xl font-bold truncate"
                     style={{ color: colors.text }}
                   >
                     Expense Tracker
                   </h1>
-                  {/* Mobile Date and Time */}
-                  <div className="lg:hidden flex items-center space-x-1 mt-0.5">
+                  <div className="flex items-center space-x-1 mt-0.5">
                     <Clock className="w-3 h-3" style={{ color: colors.text }} />
                     <span
                       className="text-xs font-medium"
@@ -133,13 +163,37 @@ const Header = ({
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-4">
+            {/* Desktop Navigation (modernized) */}
+            <div className="hidden lg:flex items-center space-x-3">
+              {/* Date and Time Display */}
+              <div
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg border border-opacity-20"
+                style={{
+                  backgroundColor: colors.cardBg,
+                  borderColor: colors.border,
+                }}
+              >
+                <Clock
+                  className="w-4 h-4"
+                  style={{ color: colors.textSecondary }}
+                />
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: colors.text }}
+                >
+                  {formatDateTime(currentDateTime)}
+                </span>
+              </div>
+
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className={`${baseButtonStyles} cursor-pointer`}
-                style={{ backgroundColor: colors.accent, color: colors.text }}
+                className="flex items-center justify-center w-10 h-10 rounded-lg border border-opacity-20 hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
+                style={{
+                  backgroundColor: colors.cardBg,
+                  borderColor: colors.border,
+                  color: colors.text,
+                }}
                 title={`Switch to ${isDarkMode ? "Light" : "Dark"} Mode`}
               >
                 {isDarkMode ? (
@@ -147,28 +201,16 @@ const Header = ({
                 ) : (
                   <Moon className="w-4 h-4" />
                 )}
-                <span className="text-sm font-medium">
-                  {isDarkMode ? "Light" : "Dark"}
-                </span>
               </button>
-
-              {/* Date and Time Display */}
-              <div
-                className={baseButtonStyles}
-                style={{ backgroundColor: colors.surface, color: colors.text }}
-              >
-                <span className="text-sm font-medium">
-                  {formatDateTime(currentDateTime)}
-                </span>
-              </div>
 
               {/* Export Button */}
               <button
                 onClick={handleExportClick}
                 disabled={Object.keys(budgets).length === 0}
-                className={`${baseButtonStyles} disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-opacity-20 hover:shadow-md transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
                 style={{
                   backgroundColor: colors.buttonPrimary,
+                  borderColor: colors.border,
                   color: colors.text,
                 }}
                 title="Export Report"
@@ -181,12 +223,16 @@ const Header = ({
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={handleProfileClick}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-xl shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                  style={{ backgroundColor: colors.accent, color: colors.text }}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-lg border border-opacity-20 hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
+                  style={{
+                    backgroundColor: colors.cardBg,
+                    borderColor: colors.border,
+                    color: colors.text,
+                  }}
                 >
                   {/* Profile Avatar */}
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm"
+                    className="w-7 h-7 rounded-full flex items-center justify-center font-semibold text-sm"
                     style={{
                       backgroundColor: colors.buttonPrimary,
                       color: colors.text,
@@ -194,6 +240,9 @@ const Header = ({
                   >
                     {getInitial(user.email)}
                   </div>
+                  <span className="text-sm font-medium max-w-32 truncate">
+                    {user.email.split("@")[0]}
+                  </span>
                   <ChevronDown
                     className={`w-4 h-4 transition-transform duration-200 ${
                       profileDropdownOpen ? "rotate-180" : ""
@@ -204,7 +253,7 @@ const Header = ({
                 {/* Dropdown Menu */}
                 {profileDropdownOpen && (
                   <div
-                    className="absolute right-0 mt-2 w-56 rounded-xl shadow-lg border z-50 animate-slide-down"
+                    className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border z-50 animate-slide-down backdrop-blur-sm"
                     style={{
                       backgroundColor: colors.surface,
                       borderColor: colors.border,
@@ -237,7 +286,7 @@ const Header = ({
                               className="text-xs"
                               style={{ color: colors.textSecondary }}
                             >
-                              Signed in
+                              Active session
                             </p>
                           </div>
                         </div>
@@ -246,7 +295,7 @@ const Header = ({
                       {/* Change Password Option */}
                       <button
                         onClick={handleChangePasswordClick}
-                        className="w-full px-4 py-2 text-left flex items-center space-x-3 hover:bg-opacity-80 transition-colors duration-200 cursor-pointer"
+                        className="w-full px-4 py-3 text-left flex items-center space-x-3 hover:bg-opacity-80 transition-colors duration-200 cursor-pointer"
                         style={{ color: colors.text }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = colors.cardBg;
@@ -268,7 +317,7 @@ const Header = ({
                       {/* Sign Out Option */}
                       <button
                         onClick={handleSignOutClick}
-                        className="w-full px-4 py-2 text-left flex items-center space-x-3 hover:bg-opacity-80 transition-colors duration-200 cursor-pointer"
+                        className="w-full px-4 py-3 text-left flex items-center space-x-3 hover:bg-opacity-80 transition-colors duration-200 cursor-pointer"
                         style={{ color: colors.text }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = colors.cardBg;
@@ -286,7 +335,7 @@ const Header = ({
               </div>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button (unchanged) */}
             <div className="lg:hidden">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -302,7 +351,7 @@ const Header = ({
             </div>
           </div>
 
-          {/* Mobile Navigation Menu */}
+          {/* Mobile Navigation Menu (unchanged) */}
           {mobileMenuOpen && (
             <div
               className="lg:hidden animate-slide-down px-4 py-6 space-y-6"

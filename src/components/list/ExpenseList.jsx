@@ -330,14 +330,14 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
               </button>
             )}
             <div className="min-w-0 flex-1">
-              <h3
-                style={{ color: colors.text }}
-                className="text-base sm:text-lg font-semibold truncate"
-              >
-                {isInCategoryView
-                  ? budgets[selectedCategory]?.name || "Category"
-                  : "Recent Expenses"}
-              </h3>
+              {isInCategoryView && (
+                <h3
+                  style={{ color: colors.text }}
+                  className="text-base sm:text-lg font-semibold truncate mb-2"
+                >
+                  {budgets[selectedCategory]?.name || "Category"}
+                </h3>
+              )}
               <div
                 style={{ color: colors.text }}
                 className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs sm:text-sm"
@@ -357,7 +357,7 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
           {(!shouldShowCategories || isInCategoryView) && (
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex-shrink-0 ${
+              className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex-shrink-0 cursor-pointer ${
                 showFilters
                   ? `${
                       colors.background === "#1A1A1A"
@@ -401,7 +401,7 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
               value={searchTerm}
               name="search"
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ borderColor: colors.border }}
+              style={{ borderColor: colors.border, color: colors.text }}
               className="w-full pl-10 pr-4 py-2 sm:py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-800 focus:border-transparent"
             />
           </div>
@@ -425,9 +425,11 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
                     onChange={(e) => setFilterBudget(e.target.value)}
                     className="w-full p-2 sm:p-2.5 text-sm border border-amber-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300"
                   >
-                    <option value="all">All Budgets</option>
+                    <option style={{ color: "brown" }} value="all">
+                      All Budgets
+                    </option>
                     {Object.entries(budgets).map(([id, budget]) => (
-                      <option key={id} value={id}>
+                      <option style={{ color: "brown" }} key={id} value={id}>
                         {budget.name}
                       </option>
                     ))}
@@ -501,7 +503,7 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
             <div className="flex justify-end">
               <button
                 onClick={clearFilters}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-amber-600 hover:text-amber-800 font-medium"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-amber-600 hover:text-amber-800 font-medium cursor-pointer"
               >
                 Clear All Filters
               </button>
@@ -869,7 +871,7 @@ const ExpenseList = ({ expenses, budgets, onDelete, colors, user }) => {
 
                         <button
                           onClick={() => onDelete(expense.id)}
-                          className={`p-1.5 sm:p-2 rounded-full transition-colors active:scale-90 ${
+                          className={`p-1.5 sm:p-2 rounded-full transition-colors active:scale-90 cursor-pointer ${
                             colors.background === "#1A1A1A"
                               ? "text-[#AF8F6F] hover:text-[#F8F4E1] hover:bg-[#4A3426]"
                               : "text-amber-400 hover:text-amber-600 hover:bg-amber-50"

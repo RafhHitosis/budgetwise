@@ -5,6 +5,37 @@ const SummaryCards = ({ totalBudget, totalSpent, colors }) => {
   const spentPercentage =
     totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
+  // Improved status logic
+  const getBudgetStatus = () => {
+    if (remaining < 0) {
+      return {
+        status: "HIGH",
+        color: "bg-red-400/20 text-red-400",
+        message: "Exceeded limit",
+      };
+    } else if (spentPercentage >= 90) {
+      return {
+        status: "WARN",
+        color: "bg-yellow-400/20 text-yellow-400",
+        message: "Nearly exhausted",
+      };
+    } else if (spentPercentage >= 75) {
+      return {
+        status: "CAUTION",
+        color: "bg-orange-400/20 text-orange-400",
+        message: "Getting low",
+      };
+    } else {
+      return {
+        status: "SAFE",
+        color: "bg-green-400/20 text-green-400",
+        message: "Within budget",
+      };
+    }
+  };
+
+  const budgetStatus = getBudgetStatus();
+
   return (
     <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10">
       {/* Total Budget Card */}
@@ -45,7 +76,9 @@ const SummaryCards = ({ totalBudget, totalSpent, colors }) => {
             })}
           </p>
           <div className="flex items-center text-xs opacity-70">
-            <div className="w-2 h-2 rounded-full bg-current mr-2"></div>
+            <div className="px-2 py-1 rounded-full text-xs font-medium mr-2 bg-current/20 text-current">
+              TOTAL
+            </div>
             Available funds
           </div>
         </div>
@@ -100,7 +133,9 @@ const SummaryCards = ({ totalBudget, totalSpent, colors }) => {
           </div>
 
           <div className="flex items-center text-xs opacity-70">
-            <div className="w-2 h-2 rounded-full bg-current mr-2"></div>
+            <div className="px-2 py-1 rounded-full text-xs font-medium mr-2 bg-current/20 text-current">
+              USED
+            </div>
             {spentPercentage.toFixed(1)}% of budget
           </div>
         </div>
@@ -152,11 +187,11 @@ const SummaryCards = ({ totalBudget, totalSpent, colors }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center text-xs opacity-70">
               <div
-                className={`w-2 h-2 rounded-full mr-2 ${
-                  remaining >= 0 ? "bg-green-400" : "bg-red-400"
-                }`}
-              ></div>
-              {remaining >= 0 ? "Within budget" : "Exceeded limit"}
+                className={`px-2 py-1 rounded-full text-xs font-medium mr-2 ${budgetStatus.color}`}
+              >
+                {budgetStatus.status}
+              </div>
+              {budgetStatus.message}
             </div>
 
             {remaining >= 0 && totalBudget > 0 && (
