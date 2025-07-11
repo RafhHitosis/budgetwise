@@ -124,21 +124,33 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
   // Form toggle handlers
-  const createFormToggle = (formSetter, formRef) => () => {
-    closeAllForms();
-    formSetter(true);
-    if (formRef) setTimeout(() => scrollToElement(formRef), 100);
+  const createFormToggle = (formState, formSetter, formRef) => () => {
+    if (formState) {
+      // If form is already open, close it
+      formSetter(false);
+    } else {
+      // Close all others and open this one
+      closeAllForms();
+      formSetter(true);
+      if (formRef) setTimeout(() => scrollToElement(formRef), 100);
+    }
   };
 
   const handleBudgetFormToggle = createFormToggle(
+    showBudgetForm,
     setShowBudgetForm,
     budgetFormRef
   );
   const handleExpenseFormToggle = createFormToggle(
+    showExpenseForm,
     setShowExpenseForm,
     expenseFormRef
   );
-  const handleGoalFormToggle = createFormToggle(setShowGoalForm, budgetFormRef);
+  const handleGoalFormToggle = createFormToggle(
+    showGoalForm,
+    setShowGoalForm,
+    budgetFormRef
+  );
 
   // Edit handlers
   const handleEditClick = (budget) => {

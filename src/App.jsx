@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import AuthForm from "./components/auth/AuthForm";
 import Dashboard from "./components/Dashboard";
 import { auth } from "./firebase";
@@ -11,8 +12,8 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
       setLoading(false);
     });
     return () => unsubscribe();
@@ -25,37 +26,51 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <AppContent
-        user={user}
-        loading={loading}
-        onLogin={setUser}
-        onLogout={handleLogout}
-      />
+      {loading ? (
+        <LoadingScreen />
+      ) : (
+        <div className="font-sans">
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                user ? (
+                  <Navigate to="/dashboard" />
+                ) : (
+                  <AuthForm onLogin={setUser} />
+                )
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                user ? (
+                  <Dashboard user={user} onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="*"
+              element={<Navigate to={user ? "/dashboard" : "/login"} />}
+            />
+          </Routes>
+        </div>
+      )}
     </ThemeProvider>
   );
 };
 
-const AppContent = ({ user, loading, onLogin, onLogout }) => {
+const LoadingScreen = () => {
   const { colors } = useTheme();
 
-  if (loading) {
-    return (
-      <div
-        style={{ backgroundColor: colors.background }}
-        className="min-h-screen flex items-center justify-center"
-      >
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-800 border-t-transparent"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="font-sans">
-      {user ? (
-        <Dashboard user={user} onLogout={onLogout} />
-      ) : (
-        <AuthForm onLogin={onLogin} />
-      )}
+    <div
+      style={{ backgroundColor: colors.background }}
+      className="min-h-screen flex items-center justify-center"
+    >
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-800 border-t-transparent"></div>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { set, ref } from "firebase/database";
 import { auth, database } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -17,6 +18,8 @@ const AuthForm = ({ onLogin }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+
+  const navigate = useNavigate();
 
   // Validation functions
   const validateEmail = (email) => {
@@ -160,6 +163,7 @@ const AuthForm = ({ onLogin }) => {
       }
 
       onLogin(userCredential.user);
+      navigate("/dashboard");
     } catch (error) {
       console.error("Auth error:", error);
       setErrors({

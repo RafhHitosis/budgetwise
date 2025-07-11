@@ -156,22 +156,22 @@ const ExpenseForm = ({ budgets, onSubmit, onCancel, colors }) => {
             type="file"
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files[0])}
-            className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#B8906B] file:text-white hover:file:bg-[#a97c59] cursor-pointer"
+            className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-[#74512D] file:text-white hover:file:bg-[#a97c59] cursor-pointer"
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0 mt-6">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
           <button
             onClick={handleSubmit}
             disabled={uploading}
-            className="flex-1 bg-[#74512D] text-white py-3 px-4 rounded-lg hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
+            className="px-8 py-3 bg-[#74512D] text-[#F8F4E1] rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             {uploading ? "Uploading..." : "Add Expense"}
             {""}
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
+            className="px-8 py-3 bg-[#E8DCC0] text-[#543310] rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             Cancel
           </button>

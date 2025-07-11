@@ -68,16 +68,16 @@ const BudgetForm = ({ colors, onSubmit, onCancel, initialData = null }) => {
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-[#74512D] text-white py-3 px-4 rounded-lg whitespace-nowrap hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
+            className="px-8 py-3 bg-[#74512D] text-[#F8F4E1] rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             {initialData ? "Update" : "Add"} Budget
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 bg-[#e2d2c0] text-[#543310] py-3 px-4 rounded-lg whitespace-nowrap hover:shadow-md transform hover:scale-102 transition-all duration-300  cursor-pointer"
+            className="px-8 py-3 bg-[#E8DCC0] text-[#543310] rounded-xl font-medium hover:shadow-md transform hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             Cancel
           </button>

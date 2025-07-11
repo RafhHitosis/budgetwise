@@ -698,7 +698,7 @@ const ExportReport = ({ budgets, expenses, onClose, user, colors }) => {
             </h2>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-white hover:bg-opacity-20 hover:text-amber-900 rounded"
+              className="p-1 hover:bg-white hover:bg-opacity-20 hover:text-amber-900 rounded cursor-pointer"
               style={{
                 color: colors.textOnAccent,
               }}
@@ -756,7 +756,7 @@ const ExportReport = ({ budgets, expenses, onClose, user, colors }) => {
                       <button
                         key={value}
                         onClick={() => setExportFormat(value)}
-                        className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
+                        className={`p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 cursor-pointer ${
                           exportFormat === value
                             ? "bg-amber-50 shadow-md transform scale-105"
                             : "hover:shadow-sm"
@@ -895,7 +895,7 @@ const ExportReport = ({ budgets, expenses, onClose, user, colors }) => {
                 {(dateRange.startDate || dateRange.endDate) && (
                   <button
                     onClick={() => setDateRange({ startDate: "", endDate: "" })}
-                    className="text-sm mt-2 transition-colors cursor-pointer hover:opacity-80"
+                    className="text-sm mt-2 transition-colors cursor-pointer hover:opacity-80 cursor-pointer"
                     style={{
                       color: colors.textSecondary,
                     }}
@@ -917,7 +917,7 @@ const ExportReport = ({ budgets, expenses, onClose, user, colors }) => {
                   </h3>
                   <button
                     onClick={handleSelectAllBudgets}
-                    className="text-xs sm:text-sm text-amber-600 hover:text-amber-800 transition-colors"
+                    className="text-xs sm:text-sm text-amber-600 hover:text-amber-800 transition-colors cursor-pointer"
                   >
                     {Object.keys(budgets).every((id) => selectedBudgets[id])
                       ? "Deselect All"
@@ -1089,7 +1089,7 @@ const ExportReport = ({ budgets, expenses, onClose, user, colors }) => {
           <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-sm transition-colors"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer"
               style={{
                 backgroundColor: "transparent",
                 color: colors.text,
@@ -1102,7 +1102,7 @@ const ExportReport = ({ budgets, expenses, onClose, user, colors }) => {
             <button
               onClick={handleExport}
               disabled={selectedCount === 0 || isExporting}
-              className="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm flex items-center justify-center transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm flex items-center justify-center transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               style={{
                 background: `linear-gradient(to right, ${colors.buttonPrimary}, ${colors.buttonSecondary})`,
                 color: colors.text,
